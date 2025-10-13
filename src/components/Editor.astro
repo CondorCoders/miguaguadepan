@@ -1,0 +1,202 @@
+---
+import Image from "astro/components/Image.astro";
+import logo from "../assets/logo.png";
+import base from "../../public/guagua/base.png";
+import { hats } from "../data/hats.js";
+import { outfits } from "../data/outfits";
+---
+
+<div id="container">
+  <main>
+    <nav>
+      <Image id="logo" src={logo} alt="Astro Logo" />
+    </nav>
+    <div class="content">
+      <section id="guagua" class="guagua">
+        <Image class="base" src={base} alt="Preview" />
+      </section>
+      <section id="editor">
+        <h1>Crea tu guagua</h1>
+        <h2>Sombreros</h2>
+        <div id="hats" class="hats">
+          {
+            hats.map((hat) => (
+              <button data-hat={hat.image} data-top={hat.top}>
+                {hat.id.charAt(0).toUpperCase() + hat.id.slice(1)}
+              </button>
+            ))
+          }
+        </div>
+
+        <h2>Rostros</h2>
+        <h2>Atuendos</h2>
+        <div id="outfits" class="outfits">
+          {
+            outfits.map((outfit) => (
+              <button data-outfit={outfit.image} data-bottom={outfit.bottom}>
+                {outfit.id.charAt(0).toUpperCase() + outfit.id.slice(1)}
+              </button>
+            ))
+          }
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+
+<script>
+  const guaguaContainer = document.getElementById("guagua");
+
+  const hatsContainer = document.getElementById("hats");
+  const outfitsContainer = document.getElementById("outfits");
+
+  // Sombreros
+  hatsContainer?.addEventListener("click", (event) => {
+    if (event.target?.tagName === "BUTTON") {
+      const selectedHat = event.target.getAttribute("data-hat");
+      const topOffset = event.target.getAttribute("data-top");
+
+      // Remover si ya hay un sombrero
+      const existingHat = guaguaContainer?.querySelector("#hat");
+      if (existingHat && existingHat.src !== selectedHat) {
+        guaguaContainer?.removeChild(existingHat);
+      }
+
+      const hatImage = document.createElement("img");
+      hatImage.id = "hat";
+      hatImage.src = selectedHat;
+      hatImage.style.width = "50%";
+      hatImage.style.position = "absolute";
+      hatImage.style.top = topOffset + "px";
+      hatImage.style.left = "50%";
+      hatImage.style.transform = "translateX(-50%)";
+
+      guaguaContainer?.appendChild(hatImage);
+    }
+  });
+
+  // Outfits
+  outfitsContainer?.addEventListener("click", (event) => {
+    if (event.target?.tagName === "BUTTON") {
+      const selectedOutfit = event.target.getAttribute("data-outfit");
+
+      // Remover si ya hay un atuendo
+      const existingOutfit = guaguaContainer?.querySelector("#outfit");
+      if (existingOutfit) {
+        guaguaContainer?.removeChild(existingOutfit);
+      }
+
+      const outfitImage = document.createElement("img");
+      const bottomOffset = event.target.getAttribute("data-bottom");
+      outfitImage.id = "outfit";
+      outfitImage.src = selectedOutfit;
+      outfitImage.style.width = "80%";
+      outfitImage.style.position = "absolute";
+      outfitImage.style.bottom = bottomOffset + "px";
+      outfitImage.style.left = "50%";
+      outfitImage.style.transform = "translateX(-50%)";
+
+      guaguaContainer?.appendChild(outfitImage);
+    }
+  });
+</script>
+
+<style>
+  #container {
+    font-family: Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans",
+      Arial, sans-serif;
+    width: 100%;
+    background-image: url("../assets/background.png");
+    background-size: cover;
+    background-position: center;
+  }
+
+  main {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+
+    @media (width >= 48rem) {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  nav {
+    padding: 0 1rem;
+  }
+
+  h1 {
+    font-size: 22px;
+    margin-top: 0.25em;
+  }
+
+  #logo {
+    width: 150px;
+    height: auto;
+  }
+
+  pre {
+    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+      Consolas, "DejaVu Sans Mono", monospace;
+    font-weight: normal;
+    background: linear-gradient(14deg, #d83333 0%, #f041ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+  }
+
+  h2 {
+    font-weight: normal;
+    color: #111827;
+    font-size: 20px;
+  }
+
+  p {
+    color: #4b5563;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.006em;
+    margin: 0;
+  }
+
+  #editor {
+    width: 90%;
+    background-color: #e9d5ae;
+    border-radius: 1rem;
+    padding: 1rem;
+
+    @media (width >= 48rem) {
+      width: 30%;
+    }
+  }
+
+  .hats {
+    display: flex;
+    gap: 1rem;
+  }
+
+  .guagua {
+    z-index: 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .base {
+    width: 80%;
+    height: auto;
+  }
+</style>
