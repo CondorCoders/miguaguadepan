@@ -2,11 +2,32 @@
 import Image from "astro/components/Image.astro";
 import KonvaCanvas from "./KonvaCanvas.astro";
 import ClearButton from "./ClearButton.astro";
-import TabButton from "./TabButton.astro";
+import TabButton, { TargetType } from "./TabButton.astro";
 import logo from "../assets/logo.png";
 import hats from "../data/hats.json";
 import outfits from "../data/outfits.json";
 import faces from "../data/faces.json";
+
+const tabData = [
+  {
+    id: "hats",
+    target: TargetType.HATS,
+    icon: "/guagua/icons/hats.svg",
+    alt: "Sombreros",
+  },
+  {
+    id: "faces",
+    target: TargetType.FACES,
+    icon: "/guagua/icons/faces.svg",
+    alt: "Rostros",
+  },
+  {
+    id: "outfits",
+    target: TargetType.OUTFITS,
+    icon: "/guagua/icons/outfits.svg",
+    alt: "Atuendos",
+  },
+];
 ---
 
 <div id="container">
@@ -28,20 +49,33 @@ import faces from "../data/faces.json";
         <h1>Crea tu guagua</h1>
 
         <div
+          id="tabs"
           class="section-tabs"
           role="tablist"
           aria-label="Editor de secciones"
         >
-          <TabButton target="hats" isActive={true} />
-          <TabButton target="faces" />
-          <TabButton target="outfits" />
+          {
+            tabData.map(({ id, target, icon, alt }, index) => (
+              <TabButton
+                id={id}
+                target={target}
+                isActive={index === 0}
+                icon={icon}
+                alt={alt}
+              />
+            ))
+          }
         </div>
 
         <div id="hats" class="gallery">
-          <ClearButton type="hat" />
           {
             hats.map((hat) => (
-              <button type="button" class="gallery-item" data-hat={hat.image}>
+              <button
+                type="button"
+                class="gallery-item"
+                data-type="hat"
+                data-src={hat.image}
+              >
                 <img src={hat.image} alt={hat.id} />
               </button>
             ))
@@ -49,10 +83,14 @@ import faces from "../data/faces.json";
         </div>
 
         <div id="faces" class="gallery is-hidden">
-          <ClearButton type="face" />
           {
             faces.map((face) => (
-              <button type="button" class="gallery-item" data-face={face.image}>
+              <button
+                type="button"
+                class="gallery-item"
+                data-type="face"
+                data-src={face.image}
+              >
                 <img src={face.image} alt={face.id} />
               </button>
             ))
@@ -60,23 +98,82 @@ import faces from "../data/faces.json";
         </div>
 
         <div id="outfits" class="gallery is-hidden">
-          <ClearButton type="outfit" />
           {
             outfits.map((outfit) => (
               <button
                 type="button"
                 class="gallery-item"
-                data-outfit={outfit.image}
+                data-type="outfit"
+                data-src={outfit.image}
               >
                 <img src={outfit.image} alt={outfit.id} />
               </button>
             ))
           }
         </div>
+        <ClearButton />
       </section>
     </div>
   </main>
 </div>
+
+<script>
+  const editor = document.getElementById("editor");
+  const tabsContainer = document.getElementById("tabs");
+  const tabButtons = tabsContainer?.querySelectorAll("button[role='tab']");
+  const tabContainers = editor?.querySelectorAll(".gallery");
+  const clearButton = document.getElementById("clear");
+
+  tabsContainer?.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const tab = target?.closest("button[role='tab']") as HTMLButtonElement;
+
+    if (tab) {
+      const selectedTab = tab.getAttribute("data-target");
+      const tabContainer = editor?.querySelector(`#${selectedTab}`);
+      if (tabContainer) {
+        tabContainer.classList.remove("is-hidden");
+
+        tabContainers?.forEach((tabContent) => {
+          const isActiveTab = tabContent.id === selectedTab;
+          tabContent.classList.toggle("is-hidden", !isActiveTab);
+        });
+      }
+
+      tabButtons?.forEach((tab) => {
+        const isActiveTab = tab.getAttribute("data-target") === selectedTab;
+        tab.setAttribute("aria-selected", isActiveTab ? "true" : "false");
+        tab.classList.toggle("active", isActiveTab);
+      });
+    }
+  });
+
+  editor?.addEventListener("click", (event) => {
+    const target = event.target as HTMLElement;
+    const closestButton = target?.closest("button.gallery-item");
+    const button = closestButton as HTMLButtonElement;
+
+    if (button) {
+      const type = button.getAttribute("data-type");
+      const src = button.getAttribute("data-src");
+
+      if (src && type) {
+        const event = new CustomEvent(
+          `add${type.charAt(0).toUpperCase() + type.slice(1)}`,
+          {
+            detail: { src, type },
+          }
+        );
+        window.dispatchEvent(event);
+      }
+    }
+  });
+
+  clearButton?.addEventListener("click", (event) => {
+    const customEvent = new CustomEvent("deleteSelected");
+    window.dispatchEvent(customEvent);
+  });
+</script>
 
 <style>
   :global(html, body) {

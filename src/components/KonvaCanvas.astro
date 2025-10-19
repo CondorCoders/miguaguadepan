@@ -17,9 +17,19 @@
     private transformer: any = null;
     private isMobile: boolean = false;
     private needsRedraw: boolean = false;
-    private pendingVersions: Record<string, number> = { hat: 0, face: 0, outfit: 0 };
+    private pendingVersions: Record<string, number> = {
+      hat: 0,
+      face: 0,
+      outfit: 0,
+    };
     private eventHandler: any = null;
-    private eventTypes: string[] = ["addHat", "addFace", "addOutfit", "clearElement"];
+    private eventTypes: string[] = [
+      "addHat",
+      "addFace",
+      "addOutfit",
+      "clearElement",
+      "deleteSelected",
+    ];
 
     constructor(containerId: string) {
       const container = document.getElementById(containerId);
@@ -108,7 +118,7 @@
       id: string,
       initialPosition: { x: number; y: number },
       initialScale: number = 1,
-      version?: number,
+      version?: number
     ): any {
       const imageObj = new Image();
       imageObj.crossOrigin = "anonymous";
@@ -124,6 +134,7 @@
       konvaImage.on("click tap", (e: any) => {
         e.cancelBubble = true;
         this.addTransformer(konvaImage);
+        console.log(konvaImage);
       });
       konvaImage.on("transform", () => {
         // Limitar escala mínima y máxima visualmente (por si el usuario arrastra demasiado)
@@ -140,7 +151,10 @@
       // Cargar imagen
       imageObj.onload = () => {
         // Si llegó una solicitud más nueva para este grupo, descartar esta carga
-        if (typeof version === "number" && this.pendingVersions[id] !== version) {
+        if (
+          typeof version === "number" &&
+          this.pendingVersions[id] !== version
+        ) {
           return;
         }
         // Tamaños base por tipo de elemento (diferentes para móvil y desktop)
@@ -186,6 +200,9 @@
           case "clearElement":
             this.removeElement(event.detail.type);
             break;
+          case "deleteSelected":
+            this.deleteSelected();
+            break;
         }
       };
 
@@ -214,7 +231,7 @@
         outfit: { x: 140, y: 255 },
       },
       desktop: {
-        hat: { x: 200, y: 90 },
+        hat: { x: 200, y: 160 },
         face: { x: 200, y: 240 },
         outfit: { x: 200, y: 420 },
       },
@@ -244,7 +261,13 @@
       this.pendingVersions.outfit += 1;
       const v = this.pendingVersions.outfit;
       this.removeElement("outfit");
-      this.createDraggableImage(src, "outfit", this.getPositions().outfit, 1.0, v);
+      this.createDraggableImage(
+        src,
+        "outfit",
+        this.getPositions().outfit,
+        1.0,
+        v
+      );
     }
 
     public removeElement(type: string) {
@@ -259,6 +282,17 @@
       }
     }
 
+    public deleteSelected() {
+      if (this.transformer) {
+        const nodes = this.transformer.nodes();
+        nodes.forEach((node: any) => {
+          node.destroy();
+        });
+        this.removeTransformer();
+        this.scheduleRedraw();
+      }
+    }
+
     public resize(width: number, height: number) {
       this.stage.width(width);
       this.stage.height(height);
@@ -268,7 +302,7 @@
     private addTransformer(node: any) {
       if (!this.transformer) {
         this.transformer = new Konva.Transformer({
-          rotateEnabled: false,
+          rotateEnabled: true,
           enabledAnchors: [
             "top-left",
             "top-right",
@@ -296,11 +330,11 @@
   const CANVAS_CONFIG = {
     mobile: {
       width: 280, // Ancho del canvas en móviles
-      height: 400, // Alto del canvas en móviles
+      height: 500, // Alto del canvas en móviles
     },
     desktop: {
       width: 400, // Ancho del canvas en desktop
-      height: 650, // Alto del canvas en desktop
+      height: 750, // Alto del canvas en desktop
     },
     breakpoint: 600, // Punto de quiebre para móvil/desktop en px
   };
@@ -315,11 +349,11 @@
     // Calcular dimensiones máximas
     const vh = Math.max(
       document.documentElement.clientHeight || 0,
-      window.innerHeight || 0,
+      window.innerHeight || 0
     );
     const vw = Math.max(
       document.documentElement.clientWidth || 0,
-      window.innerWidth || 0,
+      window.innerWidth || 0
     );
 
     const maxHeight = Math.floor(0.8 * vh);
@@ -343,7 +377,7 @@
       // Responsivo: ajustar tamaño al cargar y al cambiar tamaño
       updateResponsiveCanvasSize(canvas);
       window.addEventListener("resize", () =>
-        updateResponsiveCanvasSize(canvas),
+        updateResponsiveCanvasSize(canvas)
       );
 
       // Guardar referencia global para acceso desde otros scripts
