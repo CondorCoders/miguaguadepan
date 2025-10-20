@@ -62,6 +62,7 @@
       "addOutfit",
       "clearElement",
       "deleteSelected",
+      "downloadImage",
     ];
 
     constructor(containerId: string) {
@@ -310,6 +311,9 @@
           case "deleteSelected":
             this.deleteSelected();
             break;
+          case "downloadImage":
+            this.downloadImage();
+            break;
         }
       };
 
@@ -356,6 +360,52 @@
         this.setCursor("default");
         this.scheduleRedraw();
       }
+    }
+
+    public async downloadImage() {
+      this.removeTransformer();
+      // add logo
+      let logoNode: any | null = null;
+
+      await new Promise<void>((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        img.onload = () => {
+          const desiredWidth = 100;
+          const aspect = img.naturalHeight / img.naturalWidth || 1;
+          const desiredHeight = desiredWidth * aspect;
+          const margin = this.isMobile ? 6 : 10;
+
+          const x = this.stage.width() - desiredWidth - margin;
+          const y = this.stage.height() - desiredHeight - margin;
+
+          logoNode = new Konva.Image({
+            x,
+            y,
+            image: img,
+            width: desiredWidth,
+            height: desiredHeight,
+            listening: false,
+          });
+
+          this.layer.add(logoNode);
+          this.layer.draw();
+          resolve();
+        };
+        img.src = "/logo.png";
+      });
+
+      const dataURL = this.stage.toDataURL({ pixelRatio: 3 });
+
+      if (logoNode) {
+        logoNode.destroy();
+        this.layer.draw();
+      }
+      const link = document.createElement("a");
+      link.href = dataURL;
+      link.download = "mi-guagua-de-pan.png";
+      link.click();
     }
 
     // TRANSFORMER

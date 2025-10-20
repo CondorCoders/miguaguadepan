@@ -30,5 +30,17 @@
   {
     "id": "face8",
     "image": "/guagua/faces/face8.png"
+  },
+  {
+    "id": "face9",
+    "image": "/guagua/faces/face9.png"
+  },
+  {
+    "id": "face10",
+    "image": "/guagua/faces/face10.png"
+  },
+  {
+    "id": "face11",
+    "image": "/guagua/faces/face11.png"
   }
 ]

@@ -32,16 +32,21 @@ const tabData = [
 <div id="container">
   <main>
     <nav>
-      <Image id="logo" src={logo} alt="Astro Logo" decoding={"async"} />
+      <Image
+        id="logo"
+        src={logo}
+        alt="Astro Logo"
+        loading={"lazy"}
+        decoding={"async"}
+      />
     </nav>
     <div class="content">
       <section id="guagua" class="guagua">
         <KonvaCanvas />
+        <button id="download">Descargar imagen</button>
       </section>
       <section id="editor">
-        <div class="editor-header">
-          <h1>Crea tu guagua</h1>
-        </div>
+        <h1>Crea tu guagua</h1>
 
         <div
           id="tabs"
@@ -62,69 +67,49 @@ const tabData = [
           }
         </div>
 
-        <div id="hats" class="gallery-container" data-category="hats">
-          <div class="gallery-wrapper">
-            <div class="gallery">
-              {
-                hats.map((hat) => (
-                  <button
-                    type="button"
-                    class="gallery-item"
-                    data-type="hat"
-                    data-src={hat.image}
-                  >
-                    <img src={hat.image} alt={hat.id} />
-                  </button>
-                ))
-              }
-            </div>
-          </div>
+        <div id="hats" class="gallery">
+          {
+            hats.map((hat) => (
+              <button
+                type="button"
+                class="gallery-item"
+                data-type="hat"
+                data-src={hat.image}
+              >
+                <img src={hat.image} alt={hat.id} />
+              </button>
+            ))
+          }
         </div>
 
-        <div
-          id="faces"
-          class="gallery-container is-hidden"
-          data-category="faces"
-        >
-          <div class="gallery-wrapper">
-            <div class="gallery">
-              {
-                faces.map((face) => (
-                  <button
-                    type="button"
-                    class="gallery-item"
-                    data-type="face"
-                    data-src={face.image}
-                  >
-                    <img src={face.image} alt={face.id} />
-                  </button>
-                ))
-              }
-            </div>
-          </div>
+        <div id="faces" class="gallery is-hidden">
+          {
+            faces.map((face) => (
+              <button
+                type="button"
+                class="gallery-item"
+                data-type="face"
+                data-src={face.image}
+              >
+                <img src={face.image} alt={face.id} />
+              </button>
+            ))
+          }
         </div>
 
-        <div
-          id="outfits"
-          class="gallery-container is-hidden"
-          data-category="outfits"
-        >
-          <div class="gallery-wrapper">
-            <div class="gallery">
-              {
-                outfits.map((outfit) => (
-                  <button
-                    type="button"
-                    class="gallery-item"
-                    data-type="outfit"
-                    data-src={outfit.image}
-                  >
-                    <img src={outfit.image} alt={outfit.id} />
-                  </button>
-                ))
-              }
-            </div>
-          </div>
+        <div id="outfits" class="gallery is-hidden">
+          {
+            outfits.map((outfit) => (
+              <button
+                type="button"
+                class="gallery-item"
+                data-type="outfit"
+                data-src={outfit.image}
+              >
+                <img src={outfit.image} alt={outfit.id} />
+              </button>
+            ))
+          }
         </div>
       </section>
     </div>
@@ -135,7 +120,9 @@ const tabData = [
   const editor = document.getElementById("editor");
   const tabsContainer = document.getElementById("tabs");
   const tabButtons = tabsContainer?.querySelectorAll("button[role='tab']");
-  const galleryContainers = editor?.querySelectorAll(".gallery-container");
+  const tabContainers = editor?.querySelectorAll(".gallery");
+  const clearButton = document.getElementById("clear");
+  const downloadButton = document.getElementById("download");
 
   tabsContainer?.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
@@ -147,9 +134,9 @@ const tabData = [
       if (tabContainer) {
         tabContainer.classList.remove("is-hidden");
 
-        galleryContainers?.forEach((container) => {
-          const isActiveTab = container.id === selectedTab;
-          container.classList.toggle("is-hidden", !isActiveTab);
+        tabContainers?.forEach((tabContent) => {
+          const isActiveTab = tabContent.id === selectedTab;
+          tabContent.classList.toggle("is-hidden", !isActiveTab);
         });
       }
 
@@ -175,11 +162,21 @@ const tabData = [
           `add${type.charAt(0).toUpperCase() + type.slice(1)}`,
           {
             detail: { src, type },
-          },
+          }
         );
         window.dispatchEvent(event);
       }
     }
+  });
+
+  clearButton?.addEventListener("click", (event) => {
+    const customEvent = new CustomEvent("deleteSelected");
+    window.dispatchEvent(customEvent);
+  });
+
+  downloadButton?.addEventListener("click", (event) => {
+    const customEvent = new CustomEvent("downloadImage");
+    window.dispatchEvent(customEvent);
   });
 </script>
 
@@ -191,32 +188,14 @@ const tabData = [
   }
 
   #container {
-    font-family: "Boogaloo", sans-serif;
-    font-weight: 400;
-    font-style: normal;
+    font-family: Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans",
+      Arial, sans-serif;
     width: 100%;
-    min-height: 100dvh;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  #container::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     background-image: url("../assets/background.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    z-index: -1;
-
-    @media (width < 48rem) {
-      position: absolute;
-      background-attachment: scroll;
-    }
+    background-attachment: fixed;
   }
 
   main {
@@ -234,16 +213,14 @@ const tabData = [
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    padding: 0 1rem;
+    padding: 0;
     min-height: 0;
     box-sizing: border-box;
-    width: 100%;
 
     @media (width >= 48rem) {
       flex-direction: row;
       flex-wrap: wrap;
       gap: 5rem;
-      padding: 0;
     }
   }
 
@@ -257,27 +234,20 @@ const tabData = [
     }
   }
 
-  .editor-header {
-    text-align: center;
-    margin-bottom: 2rem;
-  }
-
   h1 {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
-    margin: 0 0 0.5rem 0;
-    color: #ebd2a6;
-    letter-spacing: -0.02em;
-    text-shadow:
-      -1px -1px 0 #663613,
-      1px -1px 0 #663613,
-      -1px 1px 0 #663613,
-      1px 1px 0 #663613;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+    color: #dad0c4;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    letter-spacing: -0.025em;
   }
 
   @media (width >= 48rem) {
     h1 {
-      font-size: 2.25rem;
+      font-size: 1.75rem;
+      margin: 0 0 2rem 0;
     }
   }
 
@@ -292,169 +262,137 @@ const tabData = [
     }
   }
 
+  pre {
+    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
+      Consolas, "DejaVu Sans Mono", monospace;
+    font-weight: normal;
+    background: linear-gradient(14deg, #d83333 0%, #f041ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+  }
+
+  h2 {
+    font-weight: normal;
+    color: #111827;
+    font-size: 20px;
+  }
+
+  p {
+    color: #4b5563;
+    font-size: 16px;
+    line-height: 24px;
+    letter-spacing: -0.006em;
+    margin: 0;
+  }
+
   #editor {
-    width: calc(100vw - 2rem);
-    max-width: 95%;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(
-      135deg,
-      rgba(254, 205, 110, 0.85) 0%,
-      rgba(241, 164, 63, 0.75) 100%
-    );
-    backdrop-filter: blur(20px);
-    border-radius: 1.5rem;
-    padding: 2rem 1.5rem;
+    width: 90%;
+    background-color: rgba(233, 213, 174, 0.6);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 1rem;
+    padding: 1rem;
     min-height: 350px;
-    margin-bottom: 2rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
-    box-sizing: border-box;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
 
     @media (width >= 48rem) {
       width: 40%;
-      width: 45%;
-      max-width: none;
-      min-height: 550px;
-      max-height: 550px;
-      padding: 3rem 2.5rem;
-      margin-bottom: 0;
+      min-height: 450px;
     }
   }
 
   .section-tabs {
     display: flex;
     gap: 0.75rem;
-    justify-content: space-around;
-    margin-bottom: 2rem;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.4);
-    border-radius: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
-  }
-
-  .gallery-container {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    margin-bottom: 1rem;
-  }
-
-  @media (width >= 48rem) {
-    .gallery-container {
-      min-height: auto;
-      max-height: none;
-      margin-bottom: 0;
-    }
-  }
-
-  .gallery-wrapper {
-    display: flex;
-    flex-direction: column;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 1.25rem;
-    padding: 1rem;
-    overflow: visible;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
-    max-height: 250px;
-    min-height: 0;
+    justify-content: center;
+    margin-bottom: 0.75rem;
   }
 
   .gallery {
     width: 100%;
-    display: flex;
-    gap: 0.75rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.25rem;
   }
 
-  .gallery::-webkit-scrollbar {
-    display: none;
+  @media (width >= 24rem) {
+    .gallery {
+      grid-template-columns: repeat(4, 1fr);
+    }
   }
 
   @media (width >= 48rem) {
     .gallery {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1rem;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scroll-snap-type: y mandatory;
-      max-height: none;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.75rem;
+      max-height: 350px;
     }
   }
 
+  /* Scroll personalizado para la galería */
+  .gallery::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .gallery::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+  }
+
+  .gallery::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+  }
+
+  .gallery::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+  }
   .gallery-item {
-    padding: 0.5rem;
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 0.25rem;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     cursor: pointer;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 0.75rem;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
-    flex: 0 0 auto;
-    width: 100px;
-    height: 100px;
-    scroll-snap-align: center;
+    border-radius: 1rem;
+    transition: all 0.3s ease;
   }
-
-  .gallery-item::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(241, 164, 63, 0.1);
-    opacity: 0;
-    transition: opacity 0.2s ease;
-    border-radius: inherit;
-  }
-
-  .gallery-item:hover::before {
-    opacity: 1;
-  }
-
   .gallery-item:hover {
-    background: rgba(254, 205, 110, 0.8);
-    border-color: rgba(241, 164, 63, 0.5);
+    background: rgba(254, 252, 232, 0.7);
+    border-color: rgba(250, 204, 21, 0.4);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(210, 107, 0, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
-
-  .gallery-item:active {
-    transform: translateY(0);
-  }
-
   .gallery-item:focus-visible {
-    outline: 2px solid #f1a43f;
+    outline: 3px solid #facc15;
     outline-offset: 2px;
   }
-
   .gallery-item img {
-    width: 70%;
-    height: 70%;
+    width: 80%;
+    height: 80%;
     object-fit: contain;
     display: block;
-    position: relative;
-    z-index: 1;
-    transition: transform 0.2s ease;
-  }
-
-  .gallery-item:hover img {
-    transform: scale(1.05);
   }
 
   .is-hidden {
     display: none;
+  }
+
+  .hats,
+  .faces,
+  .outfits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
   }
 
   .guagua {
