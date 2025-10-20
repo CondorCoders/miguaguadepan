@@ -46,5 +46,17 @@
   {
     "id": "outfits12",
     "image": "/guagua/outfits/outfits12.png"
+  },
+  {
+    "id": "outfits13",
+    "image": "/guagua/outfits/outfits13.png"
+  },
+  {
+    "id": "outfits14",
+    "image": "/guagua/outfits/outfits14.png"
+  },
+  {
+    "id": "outfits15",
+    "image": "/guagua/outfits/outfits15.png"
   }
 ]

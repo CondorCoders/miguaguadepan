@@ -54,5 +54,13 @@
   {
     "id": "hat14",
     "image": "/guagua/hats/hat14.png"
+  },
+  {
+    "id": "hat15",
+    "image": "/guagua/hats/hat15.png"
+  },
+  {
+    "id": "hat16",
+    "image": "/guagua/hats/hat16.png"
   }
 ]
