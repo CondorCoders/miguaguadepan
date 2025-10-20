@@ -44,6 +44,7 @@ const tabData = [
     <div class="content">
       <section id="guagua" class="guagua">
         <KonvaCanvas />
+        <button id="download">Descargar imagen</button>
       </section>
       <section id="editor">
         <h1>Crea tu guagua</h1>
@@ -123,6 +124,7 @@ const tabData = [
   const tabButtons = tabsContainer?.querySelectorAll("button[role='tab']");
   const tabContainers = editor?.querySelectorAll(".gallery");
   const clearButton = document.getElementById("clear");
+  const downloadButton = document.getElementById("download");
 
   tabsContainer?.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
@@ -171,6 +173,11 @@ const tabData = [
 
   clearButton?.addEventListener("click", (event) => {
     const customEvent = new CustomEvent("deleteSelected");
+    window.dispatchEvent(customEvent);
+  });
+
+  downloadButton?.addEventListener("click", (event) => {
+    const customEvent = new CustomEvent("downloadImage");
     window.dispatchEvent(customEvent);
   });
 </script>
