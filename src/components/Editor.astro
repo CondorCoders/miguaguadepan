@@ -79,33 +79,6 @@ const tabData = [
               }
             </div>
           </div>
-          <div class="pagination-controls">
-            <button type="button" class="btn-prev" aria-label="Anterior">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M12.5 15L7.5 10L12.5 5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-            <span class="page-info">
-              <span class="current-page">1</span>
-              <span class="separator">/</span>
-              <span class="total-pages">1</span>
-            </span>
-            <button type="button" class="btn-next" aria-label="Siguiente">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M7.5 15L12.5 10L7.5 5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </div>
         </div>
 
         <div
@@ -128,33 +101,6 @@ const tabData = [
                 ))
               }
             </div>
-          </div>
-          <div class="pagination-controls">
-            <button type="button" class="btn-prev" aria-label="Anterior">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M12.5 15L7.5 10L12.5 5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-            <span class="page-info">
-              <span class="current-page">1</span>
-              <span class="separator">/</span>
-              <span class="total-pages">1</span>
-            </span>
-            <button type="button" class="btn-next" aria-label="Siguiente">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M7.5 15L12.5 10L7.5 5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -179,33 +125,6 @@ const tabData = [
               }
             </div>
           </div>
-          <div class="pagination-controls">
-            <button type="button" class="btn-prev" aria-label="Anterior">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M12.5 15L7.5 10L12.5 5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-            <span class="page-info">
-              <span class="current-page">1</span>
-              <span class="separator">/</span>
-              <span class="total-pages">1</span>
-            </span>
-            <button type="button" class="btn-next" aria-label="Siguiente">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                <path
-                  d="M7.5 15L12.5 10L7.5 5"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-              </svg>
-            </button>
-          </div>
         </div>
       </section>
     </div>
@@ -217,82 +136,6 @@ const tabData = [
   const tabsContainer = document.getElementById("tabs");
   const tabButtons = tabsContainer?.querySelectorAll("button[role='tab']");
   const galleryContainers = editor?.querySelectorAll(".gallery-container");
-
-  const ITEMS_PER_PAGE_MOBILE = 8;
-  const ITEMS_PER_PAGE_DESKTOP = 10;
-
-  function getItemsPerPage() {
-    return window.innerWidth >= 768
-      ? ITEMS_PER_PAGE_DESKTOP
-      : ITEMS_PER_PAGE_MOBILE;
-  }
-
-  const paginationState: Record<string, number> = {
-    hats: 0,
-    faces: 0,
-    outfits: 0,
-  };
-
-  function updateGalleryPagination(container: Element) {
-    const category = container.getAttribute("data-category") || "";
-    const gallery = container.querySelector(".gallery");
-    const items = gallery?.querySelectorAll(".gallery-item") || [];
-    const currentPage = paginationState[category] || 0;
-    const itemsPerPage = getItemsPerPage();
-    const totalPages = Math.ceil(items.length / itemsPerPage);
-
-    items.forEach((item, index) => {
-      const startIndex = currentPage * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const shouldShow = index >= startIndex && index < endIndex;
-      (item as HTMLElement).style.display = shouldShow ? "flex" : "none";
-    });
-
-    const btnPrev = container.querySelector(".btn-prev") as HTMLButtonElement;
-    const btnNext = container.querySelector(".btn-next") as HTMLButtonElement;
-    const currentPageSpan = container.querySelector(".current-page");
-    const totalPagesSpan = container.querySelector(".total-pages");
-
-    if (btnPrev) btnPrev.disabled = currentPage === 0;
-    if (btnNext) btnNext.disabled = currentPage >= totalPages - 1;
-    if (currentPageSpan) currentPageSpan.textContent = `${currentPage + 1}`;
-    if (totalPagesSpan) totalPagesSpan.textContent = `${totalPages}`;
-  }
-
-  galleryContainers?.forEach((container) => {
-    updateGalleryPagination(container);
-
-    const category = container.getAttribute("data-category") || "";
-    const btnPrev = container.querySelector(".btn-prev");
-    const btnNext = container.querySelector(".btn-next");
-
-    btnPrev?.addEventListener("click", () => {
-      if (paginationState[category] > 0) {
-        paginationState[category]--;
-        updateGalleryPagination(container);
-      }
-    });
-
-    btnNext?.addEventListener("click", () => {
-      const gallery = container.querySelector(".gallery");
-      const items = gallery?.querySelectorAll(".gallery-item") || [];
-      const itemsPerPage = getItemsPerPage();
-      const totalPages = Math.ceil(items.length / itemsPerPage);
-
-      if (paginationState[category] < totalPages - 1) {
-        paginationState[category]++;
-        updateGalleryPagination(container);
-      }
-    });
-  });
-
-  window.addEventListener("resize", () => {
-    galleryContainers?.forEach((container) => {
-      const category = container.getAttribute("data-category") || "";
-      paginationState[category] = 0;
-      updateGalleryPagination(container);
-    });
-  });
 
   tabsContainer?.addEventListener("click", (event) => {
     const target = event.target as HTMLElement;
@@ -391,14 +234,16 @@ const tabData = [
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    padding: 0;
+    padding: 0 1rem;
     min-height: 0;
     box-sizing: border-box;
+    width: 100%;
 
     @media (width >= 48rem) {
       flex-direction: row;
       flex-wrap: wrap;
       gap: 5rem;
+      padding: 0;
     }
   }
 
@@ -448,23 +293,30 @@ const tabData = [
   }
 
   #editor {
-    width: 90%;
+    width: calc(100vw - 2rem);
+    max-width: 95%;
+    display: flex;
+    flex-direction: column;
     background: linear-gradient(
       135deg,
       rgba(254, 205, 110, 0.85) 0%,
       rgba(241, 164, 63, 0.75) 100%
     );
     backdrop-filter: blur(20px);
-    border-radius: 1rem;
-    padding: 2rem 1rem;
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem;
     min-height: 350px;
-    margin-bottom: 1rem;
+    margin-bottom: 2rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
+    box-sizing: border-box;
 
     @media (width >= 48rem) {
       width: 40%;
-      min-height: 450px;
-      padding: 2.5rem 2rem;
+      width: 45%;
+      max-width: none;
+      min-height: 550px;
+      max-height: 550px;
+      padding: 3rem 2.5rem;
       margin-bottom: 0;
     }
   }
@@ -472,9 +324,9 @@ const tabData = [
   .section-tabs {
     display: flex;
     gap: 0.75rem;
-    justify-content: center;
-    margin-bottom: 1.5rem;
-    padding: 0.5rem;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+    padding: 0.75rem;
     background: rgba(255, 255, 255, 0.4);
     border-radius: 1rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
@@ -483,40 +335,54 @@ const tabData = [
   .gallery-container {
     display: flex;
     flex-direction: column;
-    min-height: 240px;
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 1rem;
   }
 
   @media (width >= 48rem) {
     .gallery-container {
-      min-height: 300px;
+      min-height: auto;
+      max-height: none;
+      margin-bottom: 0;
     }
   }
 
   .gallery-wrapper {
-    flex: 1;
     display: flex;
     flex-direction: column;
-    min-height: 230px;
-    max-height: 230px;
-    justify-content: space-around;
     background: rgba(255, 255, 255, 0.3);
-    border-radius: 1rem;
+    border-radius: 1.25rem;
     padding: 1rem;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
+    max-height: 250px;
+    min-height: 0;
   }
 
   .gallery {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
     gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .gallery::-webkit-scrollbar {
+    display: none;
   }
 
   @media (width >= 48rem) {
     .gallery {
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.875rem;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      max-height: none;
     }
   }
 
@@ -534,6 +400,10 @@ const tabData = [
     transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
+    flex: 0 0 auto;
+    width: 100px;
+    height: 100px;
+    scroll-snap-align: center;
   }
 
   .gallery-item::before {
@@ -570,8 +440,8 @@ const tabData = [
   }
 
   .gallery-item img {
-    width: 75%;
-    height: 75%;
+    width: 70%;
+    height: 70%;
     object-fit: contain;
     display: block;
     position: relative;
@@ -581,82 +451,6 @@ const tabData = [
 
   .gallery-item:hover img {
     transform: scale(1.05);
-  }
-
-  .pagination-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.25rem;
-    padding: 1rem 0 0.25rem 0;
-    margin-top: 0.5rem;
-  }
-
-  .btn-prev,
-  .btn-next {
-    background: rgba(255, 255, 255, 0.8);
-    border: 1px solid rgba(241, 164, 63, 0.3);
-    border-radius: 0.5rem;
-    padding: 0.65rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #78716c;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  }
-
-  .btn-prev:hover:not(:disabled),
-  .btn-next:hover:not(:disabled) {
-    background: rgba(254, 205, 110, 0.9);
-    border-color: rgba(241, 164, 63, 0.5);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 10px rgba(210, 107, 0, 0.15);
-    color: #d26b00;
-  }
-
-  .btn-prev:active:not(:disabled),
-  .btn-next:active:not(:disabled) {
-    transform: translateY(0);
-  }
-
-  .btn-prev:disabled,
-  .btn-next:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-    transform: none;
-  }
-
-  .btn-prev svg,
-  .btn-next svg {
-    display: block;
-    width: 20px;
-    height: 20px;
-  }
-
-  .page-info {
-    font-size: 0.95rem;
-    color: #57534e;
-    font-weight: 600;
-    min-width: 70px;
-    text-align: center;
-    background: rgba(255, 255, 255, 0.5);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    letter-spacing: 0.02em;
-  }
-
-  .separator {
-    margin: 0 0.35rem;
-    color: #a8a29e;
-  }
-
-  .current-page {
-    color: #d26b00;
-    font-weight: 700;
   }
 
   .is-hidden {

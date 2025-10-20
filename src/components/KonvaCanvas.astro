@@ -228,11 +228,19 @@
         if (this.deleteButton) this.updateDeleteButtonPosition(konvaImage);
       });
 
+      // Drag Start: asegurar que el elemento esté seleccionado al empezar a arrastrar
+      konvaImage.on("dragstart", () => {
+        this.addTransformer(konvaImage);
+        this.attachDeleteButton(konvaImage);
+      });
+
       // Cursores de arrastre
       konvaImage.on("mouseenter", () => this.setCursor("grab"));
       konvaImage.on("mousedown touchstart", () => this.setCursor("grabbing"));
       konvaImage.on("dragend mouseup touchend", () => this.setCursor("grab"));
-      konvaImage.on("mouseleave", () => this.setCursor("default"));
+      konvaImage.on("mouseleave", () => {
+        this.setCursor("default");
+      });
     }
 
     private createDraggableImage(
