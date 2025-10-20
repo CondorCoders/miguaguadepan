@@ -364,6 +364,54 @@
 
     public async downloadImage() {
       this.removeTransformer();
+      // add background frame
+      let backgroundNode: any | null = null;
+
+      await new Promise<void>((resolve) => {
+        const img = new Image();
+        img.crossOrigin = "anonymous";
+
+        img.onload = () => {
+          const stageWidth = this.stage.width();
+          const stageHeight = this.stage.height();
+
+          // Calcular dimensiones manteniendo aspecto del marco
+          const naturalAspect = img.naturalWidth / img.naturalHeight;
+          const stageAspect = stageWidth / stageHeight;
+          
+          let bgWidth = stageWidth;
+          let bgHeight = stageHeight;
+          let bgX = 0;
+          let bgY = 0;
+
+          // Ajustar para cubrir todo el stage sin deformar
+          if (stageAspect > naturalAspect) {
+            // Stage más ancho que el marco
+            bgHeight = stageWidth / naturalAspect;
+            bgY = (stageHeight - bgHeight) / 2;
+          } else {
+            // Stage más alto que el marco
+            bgWidth = stageHeight * naturalAspect;
+            bgX = (stageWidth - bgWidth) / 2;
+          }
+
+          backgroundNode = new Konva.Image({
+            x: bgX,
+            y: bgY,
+            image: img,
+            width: bgWidth,
+            height: bgHeight,
+            listening: false,
+          });
+
+          this.layer.add(backgroundNode);
+          backgroundNode.moveToBottom(); // Poner el fondo debajo del muñeco y atuendos
+          this.layer.draw();
+          resolve();
+        };
+        img.src = "/guagua/marco.jpg";
+      });
+
       // add logo
       let logoNode: any | null = null;
 
@@ -377,8 +425,8 @@
           const desiredHeight = desiredWidth * aspect;
           const margin = this.isMobile ? 6 : 10;
 
-          const x = this.stage.width() - desiredWidth - margin;
-          const y = this.stage.height() - desiredHeight - margin;
+          const x = margin; // Esquina superior izquierda
+          const y = margin - 10; // Más arriba
 
           logoNode = new Konva.Image({
             x,
@@ -390,6 +438,7 @@
           });
 
           this.layer.add(logoNode);
+          logoNode.moveToTop(); // Poner el logo encima de todo
           this.layer.draw();
           resolve();
         };
@@ -398,10 +447,13 @@
 
       const dataURL = this.stage.toDataURL({ pixelRatio: 3 });
 
+      if (backgroundNode) {
+        backgroundNode.destroy();
+      }
       if (logoNode) {
         logoNode.destroy();
-        this.layer.draw();
       }
+      this.layer.draw();
       const link = document.createElement("a");
       link.href = dataURL;
       link.download = "mi-guagua-de-pan.png";
