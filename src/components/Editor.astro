@@ -1,7 +1,6 @@
 ---
 import Image from "astro/components/Image.astro";
 import KonvaCanvas from "./KonvaCanvas.astro";
-import ClearButton from "./ClearButton.astro";
 import TabButton, { TargetType } from "./TabButton.astro";
 import logo from "../assets/logo.png";
 import hats from "../data/hats.json";
@@ -33,21 +32,33 @@ const tabData = [
 <div id="container">
   <main>
     <nav>
-      <Image
-        id="logo"
-        src={logo}
-        alt="Astro Logo"
-        loading={"lazy"}
-        decoding={"async"}
-      />
+      <Image id="logo" src={logo} alt="Astro Logo" decoding={"async"} />
     </nav>
     <div class="content">
       <section id="guagua" class="guagua">
-        <KonvaCanvas />
-        <button id="download">Descargar imagen</button>
+        <div class="canvas-container">
+          <KonvaCanvas />
+          <button id="download" aria-label="Descargar imagen">
+            <img
+              src="/guagua/icons/descargar.svg"
+              alt="Descargar"
+              width="20"
+              height="20"
+              style="display:block; margin:auto;"
+            />
+          </button>
+        </div>
       </section>
       <section id="editor">
-        <h1>Crea tu guagua</h1>
+        <div class="titulo-container">
+          <Image
+            src="/guagua/titulo.png"
+            alt="Crea tu guagua"
+            width={300}
+            height={80}
+            class="titulo-image"
+          />
+        </div>
 
         <div
           id="tabs"
@@ -112,7 +123,6 @@ const tabData = [
             ))
           }
         </div>
-        <ClearButton />
       </section>
     </div>
   </main>
@@ -180,6 +190,7 @@ const tabData = [
     const customEvent = new CustomEvent("downloadImage");
     window.dispatchEvent(customEvent);
   });
+
 </script>
 
 <style>
@@ -190,14 +201,32 @@ const tabData = [
   }
 
   #container {
-    font-family: Inter, Roboto, "Helvetica Neue", "Arial Nova", "Nimbus Sans",
-      Arial, sans-serif;
+    font-family: "Boogaloo", sans-serif;
+    font-weight: 400;
+    font-style: normal;
     width: 100%;
+    min-height: 100dvh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  #container::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-image: url("../assets/background.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    z-index: -1;
+
+    @media (width < 48rem) {
+      position: absolute;
+      background-attachment: scroll;
+    }
   }
 
   main {
@@ -215,14 +244,16 @@ const tabData = [
     align-items: center;
     justify-content: center;
     gap: 1rem;
-    padding: 0;
+    padding: 0 1rem;
     min-height: 0;
     box-sizing: border-box;
+    width: 100%;
 
     @media (width >= 48rem) {
       flex-direction: row;
       flex-wrap: wrap;
       gap: 5rem;
+      padding: 0;
     }
   }
 
@@ -237,19 +268,39 @@ const tabData = [
   }
 
   h1 {
-    font-size: 1.5rem;
+    font-size: 2rem;
     font-weight: 700;
-    margin: 0 0 1.5rem 0;
-    text-align: center;
-    color: #dad0c4;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    letter-spacing: -0.025em;
+    margin: 0 0 0.5rem 0;
+    color: #ebd2a6;
+    letter-spacing: -0.02em;
+    text-shadow:
+      -1px -1px 0 #663613,
+      1px -1px 0 #663613,
+      -1px 1px 0 #663613,
+      1px 1px 0 #663613;
+  }
+
+  .titulo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .titulo-image {
+    max-width: 100%;
+    height: auto;
+  }
+
+  @media (width < 48rem) {
+    .titulo-image {
+      max-width: 200px;
+    }
   }
 
   @media (width >= 48rem) {
-    h1 {
-      font-size: 1.75rem;
-      margin: 0 0 2rem 0;
+    .titulo-image {
+      max-width: 300px;
     }
   }
 
@@ -264,137 +315,141 @@ const tabData = [
     }
   }
 
-  pre {
-    font-family: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo,
-      Consolas, "DejaVu Sans Mono", monospace;
-    font-weight: normal;
-    background: linear-gradient(14deg, #d83333 0%, #f041ff 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0;
-  }
-
-  h2 {
-    font-weight: normal;
-    color: #111827;
-    font-size: 20px;
-  }
-
-  p {
-    color: #4b5563;
-    font-size: 16px;
-    line-height: 24px;
-    letter-spacing: -0.006em;
-    margin: 0;
-  }
-
   #editor {
-    width: 90%;
-    background-color: rgba(233, 213, 174, 0.6);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 1rem;
-    padding: 1rem;
+    width: calc(100vw - 2rem);
+    max-width: 95%;
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(
+      135deg,
+      rgba(254, 205, 110, 0.85) 0%,
+      rgba(241, 164, 63, 0.75) 100%
+    );
+    backdrop-filter: blur(20px);
+    border-radius: 1.5rem;
+    padding: 2rem 1.5rem;
     min-height: 350px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
+    box-sizing: border-box;
 
     @media (width >= 48rem) {
       width: 40%;
-      min-height: 450px;
+      width: 45%;
+      max-width: none;
+      min-height: 550px;
+      max-height: 550px;
+      padding: 3rem 2.5rem;
+      margin-bottom: 0;
     }
   }
 
   .section-tabs {
     display: flex;
     gap: 0.75rem;
-    justify-content: center;
-    margin-bottom: 0.75rem;
+    justify-content: space-around;
+    margin-bottom: 2rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
   }
 
   .gallery {
     width: 100%;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    max-height: 300px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding-right: 0.25rem;
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
-  @media (width >= 24rem) {
-    .gallery {
-      grid-template-columns: repeat(4, 1fr);
-    }
+  .gallery::-webkit-scrollbar {
+    display: none;
   }
 
   @media (width >= 48rem) {
     .gallery {
-      grid-template-columns: repeat(5, 1fr);
-      gap: 0.75rem;
-      max-height: 350px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      max-height: none;
     }
   }
 
-  /* Scroll personalizado para la galería */
-  .gallery::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  .gallery::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 2px;
-  }
-
-  .gallery::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 2px;
-  }
-
-  .gallery::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
   .gallery-item {
-    padding: 0.25rem;
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     cursor: pointer;
     aspect-ratio: 1 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 1rem;
-    transition: all 0.3s ease;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+    flex: 0 0 auto;
+    width: 100px;
+    height: 100px;
+    scroll-snap-align: center;
   }
+
+  .gallery-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(241, 164, 63, 0.1);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    border-radius: inherit;
+  }
+
+  .gallery-item:hover::before {
+    opacity: 1;
+  }
+
   .gallery-item:hover {
-    background: rgba(254, 252, 232, 0.7);
-    border-color: rgba(250, 204, 21, 0.4);
+    background: rgba(254, 205, 110, 0.8);
+    border-color: rgba(241, 164, 63, 0.5);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 4px 12px rgba(210, 107, 0, 0.15);
   }
+
+  .gallery-item:active {
+    transform: translateY(0);
+  }
+
   .gallery-item:focus-visible {
-    outline: 3px solid #facc15;
+    outline: 2px solid #f1a43f;
     outline-offset: 2px;
   }
+
   .gallery-item img {
-    width: 80%;
-    height: 80%;
+    width: 70%;
+    height: 70%;
     object-fit: contain;
     display: block;
+    position: relative;
+    z-index: 1;
+    transition: transform 0.2s ease;
+  }
+
+  .gallery-item:hover img {
+    transform: scale(1.05);
   }
 
   .is-hidden {
     display: none;
-  }
-
-  .hats,
-  .faces,
-  .outfits {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
   }
 
   .guagua {
@@ -407,5 +462,48 @@ const tabData = [
     width: auto;
     height: auto;
     box-sizing: border-box;
+    position: relative;
+  }
+
+  .canvas-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  #download {
+    position: absolute;
+    top: 22rem;
+    right: 14.5rem;
+    z-index: 2;
+    background-color: #fecc69;
+    color: #663613;
+    border: none;
+    border-radius: 1rem;
+    padding: 0.75rem 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(210, 107, 0, 0.15);
+    cursor: pointer;
+    transition:
+      background 0.2s,
+      transform 0.2s;
+    outline: none;
+  }
+
+  @media (width >= 48rem) {
+    #download {
+      padding: 0.75rem 0.75rem;
+      top: 1rem;
+      right: 1rem;
+    }
+  }
+
+  #download:hover {
+    background-color: #fac04b;
+    transform: scale(1.03);
+  }
+
+  #download:active {
+    transform: scale(0.98);
   }
 </style>
