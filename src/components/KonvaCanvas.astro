@@ -22,7 +22,7 @@
       width: 400,
       height: 630,
       baseSizes: { hat: 220, face: 120, outfit: 260 },
-      baseScale: 0.7, // Tamaño de la imagen base 
+      baseScale: 0.7, // Tamaño de la imagen base
     },
     breakpoint: 600,
     scaleConstraints: { min: 0.2, max: 4 },
@@ -101,7 +101,9 @@
     }
 
     private getPositions() {
-      return this.isMobile ? INITIAL_POSITIONS.mobile : INITIAL_POSITIONS.desktop;
+      return this.isMobile
+        ? INITIAL_POSITIONS.mobile
+        : INITIAL_POSITIONS.desktop;
     }
 
     private setCursor(cursor: string) {
@@ -139,7 +141,12 @@
       return { width: finalWidth, height: finalHeight };
     }
 
-    private centerImage(konvaImage: any, width: number, height: number, position: { x: number; y: number }) {
+    private centerImage(
+      konvaImage: any,
+      width: number,
+      height: number,
+      position: { x: number; y: number }
+    ) {
       konvaImage.x(position.x - width / 2);
       konvaImage.y(position.y - height / 2);
     }
@@ -157,8 +164,14 @@
 
     public getViewportDimensions() {
       return {
-        vh: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
-        vw: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
+        vh: Math.max(
+          document.documentElement.clientHeight || 0,
+          window.innerHeight || 0
+        ),
+        vw: Math.max(
+          document.documentElement.clientWidth || 0,
+          window.innerWidth || 0
+        ),
       };
     }
 
@@ -249,7 +262,7 @@
       id: string,
       initialPosition: { x: number; y: number },
       initialScale: number = 1,
-      version?: number,
+      version?: number
     ): any {
       const imageObj = new Image();
       imageObj.crossOrigin = "anonymous";
@@ -268,15 +281,24 @@
       // Cargar imagen
       imageObj.onload = () => {
         // Verificar versión
-        if (typeof version === "number" && this.pendingVersions[id] !== version) {
+        if (
+          typeof version === "number" &&
+          this.pendingVersions[id] !== version
+        ) {
           return;
         }
 
         const baseSizes = this.getConfig().baseSizes;
-        const baseWidth = baseSizes[id as keyof typeof baseSizes] || (this.isMobile ? 100 : 120);
+        const baseWidth =
+          baseSizes[id as keyof typeof baseSizes] ||
+          (this.isMobile ? 100 : 120);
 
         // Calcular dimensiones
-        const { width, height } = this.calculateProportionalDimensions(imageObj, baseWidth, initialScale);
+        const { width, height } = this.calculateProportionalDimensions(
+          imageObj,
+          baseWidth,
+          initialScale
+        );
 
         // Aplicar dimensiones y centrar
         konvaImage.width(width);
@@ -337,7 +359,13 @@
       this.pendingVersions[type] += 1;
       const version = this.pendingVersions[type];
       this.removeElement(type);
-      this.createDraggableImage(src, type, this.getPositions()[type], 1.0, version);
+      this.createDraggableImage(
+        src,
+        type,
+        this.getPositions()[type],
+        1.0,
+        version
+      );
     }
 
     // ELIMINAR ELEMENTOS
@@ -364,6 +392,7 @@
 
     public async downloadImage() {
       this.removeTransformer();
+      this.removeDeleteButton();
       // add background frame
       let backgroundNode: any | null = null;
 
@@ -378,7 +407,7 @@
           // Calcular dimensiones manteniendo aspecto del marco
           const naturalAspect = img.naturalWidth / img.naturalHeight;
           const stageAspect = stageWidth / stageHeight;
-          
+
           let bgWidth = stageWidth;
           let bgHeight = stageHeight;
           let bgX = 0;
@@ -580,9 +609,17 @@
     const isMobile = window.innerWidth < CANVAS_CONFIG.breakpoint;
     const config = isMobile ? CANVAS_CONFIG.mobile : CANVAS_CONFIG.desktop;
 
-    const { vh, vw } = (window as any).guaguaCanvas?.getViewportDimensions() || {
-      vh: Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0),
-      vw: Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0),
+    const { vh, vw } = (
+      window as any
+    ).guaguaCanvas?.getViewportDimensions() || {
+      vh: Math.max(
+        document.documentElement.clientHeight || 0,
+        window.innerHeight || 0
+      ),
+      vw: Math.max(
+        document.documentElement.clientWidth || 0,
+        window.innerWidth || 0
+      ),
     };
 
     const maxHeight = Math.floor(0.8 * vh);
@@ -605,7 +642,7 @@
 
       updateResponsiveCanvasSize(canvas);
       window.addEventListener("resize", () =>
-        updateResponsiveCanvasSize(canvas),
+        updateResponsiveCanvasSize(canvas)
       );
 
       (window as any).guaguaCanvas = canvas;
@@ -616,30 +653,30 @@
 </script>
 
 <style>
-.konva-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: auto;
-  height: auto;
-  max-width: 100vw;
-  max-height: 80vh;
-  margin: 0 auto;
-  box-sizing: border-box;
-  background-image: url(/guagua/marco.jpg);
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  border-radius: 1rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
-}
+  .konva-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    height: auto;
+    max-width: 100vw;
+    max-height: 80vh;
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-image: url(/guagua/marco.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.671);
+  }
 
-#konva-stage {
-  display: block;
-  margin: 0 auto;
-  max-width: 100vw;
-  max-height: 80vh;
-  width: auto;
-  height: auto;
-}
+  #konva-stage {
+    display: block;
+    margin: 0 auto;
+    max-width: 100vw;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+  }
 </style>

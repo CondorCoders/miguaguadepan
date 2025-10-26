@@ -1,4 +1,8 @@
 ---
+import Hats from "../assets/icons/hats.svg";
+import Faces from "../assets/icons/faces.svg";
+import Outfits from "../assets/icons/outfits.svg";
+
 export enum TargetType {
   HATS = "hats",
   FACES = "faces",
@@ -23,39 +27,38 @@ const { id, target, isActive = false, icon, alt } = Astro.props;
   aria-selected={isActive}
   data-target={target}
 >
-  <img src={icon} alt={alt} />
+  {icon === "hats" && <Hats fill="currentColor" />}
+  {icon === "faces" && <Faces fill="currentColor" />}
+  {icon === "outfits" && <Outfits fill="currentColor" />}
 </button>
 
 <style>
   .tab {
-    display: inline-flex;
+    color: #ebd2a690;
     align-items: center;
     justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(8px);
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   }
 
   .tab:hover {
-    background: rgba(254, 252, 232, 0.7);
-    border-color: rgba(250, 204, 21, 0.4);
+    color: #bfa16b;
+    border-color: rgba(253, 230, 138, 0.5);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
 
   .tab.active {
-    background: rgba(253, 230, 138, 0.7);
-    border-color: rgba(245, 158, 11, 0.5);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    color: #ebd2a6;
+    border-color: rgba(253, 230, 138, 0.7);
   }
 
-  .tab img {
+  .tab svg {
     width: 24px;
     height: 24px;
   }
