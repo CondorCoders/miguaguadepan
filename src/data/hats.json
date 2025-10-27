@@ -1,66 +1,66 @@
 [
   {
     "id": "hat1",
-    "image": "/guagua/hats/hat1.png"
-  },
-  {
-    "id": "hat2",
-    "image": "/guagua/hats/hat2.png"
-  },
-  {
-    "id": "hat3",
-    "image": "/guagua/hats/hat3.png"
-  },
-  {
-    "id": "hat4",
-    "image": "/guagua/hats/hat4.png"
-  },
-  {
-    "id": "hat5",
-    "image": "/guagua/hats/hat5.png"
-  },
-  {
-    "id": "hat6",
-    "image": "/guagua/hats/hat6.png"
-  },
-  {
-    "id": "hat7",
-    "image": "/guagua/hats/hat7.png"
-  },
-  {
-    "id": "hat8",
-    "image": "/guagua/hats/hat8.png"
-  },
-  {
-    "id": "hat9",
-    "image": "/guagua/hats/hat9.png"
-  },
-  {
-    "id": "hat10",
-    "image": "/guagua/hats/hat10.png"
-  },
-  {
-    "id": "hat11",
-    "image": "/guagua/hats/hat11.png"
-  },
-  {
-    "id": "hat12",
-    "image": "/guagua/hats/hat12.png"
-  },
-  {
-    "id": "hat13",
-    "image": "/guagua/hats/hat13.png"
-  },
-  {
-    "id": "hat14",
-    "image": "/guagua/hats/hat14.png"
-  },
-  {
-    "id": "hat15",
     "image": "/guagua/hats/hat15.png"
   },
   {
-    "id": "hat16",
+    "id": "hat2",
     "image": "/guagua/hats/hat16.png"
+  },
+  {
+    "id": "hat3",
+    "image": "/guagua/hats/hat1.png"
+  },
+  {
+    "id": "hat4",
+    "image": "/guagua/hats/hat2.png"
+  },
+  {
+    "id": "hat5",
+    "image": "/guagua/hats/hat3.png"
+  },
+  {
+    "id": "hat6",
+    "image": "/guagua/hats/hat4.png"
+  },
+  {
+    "id": "hat7",
+    "image": "/guagua/hats/hat5.png"
+  },
+  {
+    "id": "hat8",
+    "image": "/guagua/hats/hat6.png"
+  },
+  {
+    "id": "hat9",
+    "image": "/guagua/hats/hat7.png"
+  },
+  {
+    "id": "hat10",
+    "image": "/guagua/hats/hat8.png"
+  },
+  {
+    "id": "hat11",
+    "image": "/guagua/hats/hat9.png"
+  },
+  {
+    "id": "hat12",
+    "image": "/guagua/hats/hat10.png"
+  },
+  {
+    "id": "hat13",
+    "image": "/guagua/hats/hat11.png"
+  },
+  {
+    "id": "hat14",
+    "image": "/guagua/hats/hat12.png"
+  },
+  {
+    "id": "hat15",
+    "image": "/guagua/hats/hat13.png"
+  },
+  {
+    "id": "hat16",
+    "image": "/guagua/hats/hat14.png"
   }
 ]

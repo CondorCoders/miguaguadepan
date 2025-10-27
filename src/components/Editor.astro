@@ -7,18 +7,18 @@ import faces from "../data/faces.json";
 
 const tabData = [
   {
-    id: "hats",
-    type: "hat",
-    target: TargetType.HATS,
-    alt: "Sombreros",
-    content: hats,
-  },
-  {
     id: "faces",
     type: "face",
     target: TargetType.FACES,
     alt: "Rostros",
     content: faces,
+  },
+  {
+    id: "hats",
+    type: "hat",
+    target: TargetType.HATS,
+    alt: "Sombreros",
+    content: hats,
   },
   {
     id: "outfits",
@@ -118,6 +118,13 @@ const tabData = [
     const button = closestButton as HTMLButtonElement;
 
     if (button) {
+      // Marcar elemento seleccionado visualmente dentro de su galería
+      const parentGallery = button.closest(".gallery");
+      parentGallery
+        ?.querySelectorAll(".gallery-item.selected")
+        .forEach((el) => el.classList.remove("selected"));
+      button.classList.add("selected");
+
       const type = button.getAttribute("data-type");
       const src = button.getAttribute("data-src");
 
@@ -192,7 +199,7 @@ const tabData = [
 
   .gallery-item {
     padding: 0.2rem;
-    background: rgba(243, 157, 59, 0.2);
+    background: rgba(254, 205, 110, 0.3);
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.3);
     cursor: pointer;
@@ -210,10 +217,24 @@ const tabData = [
     scroll-snap-align: center;
   }
   .gallery-item:hover {
-    background: rgba(254, 205, 110, 0.8);
+    background: rgba(254, 205, 110, 0.6);
     border-color: rgba(241, 164, 63, 0.5);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(210, 107, 0, 0.15);
+  }
+
+  .gallery-item.selected {
+    background: rgba(254, 205, 110, 0.72);
+    border-color: rgba(241, 164, 63, 0.9);
+    box-shadow:
+      0 0 0 2px rgba(241, 164, 63, 0.35) inset,
+      0 6px 16px rgba(210, 107, 0, 0.18);
+  }
+  .gallery-item.selected:hover {
+    transform: none;
+    box-shadow:
+      0 0 0 2px rgba(241, 164, 63, 0.45) inset,
+      0 10px 22px rgba(210, 107, 0, 0.25);
   }
   .gallery-item:active {
     transform: translateY(0);
@@ -231,6 +252,9 @@ const tabData = [
   }
   .gallery-item:hover img {
     transform: scale(1.05);
+  }
+  .gallery-item.selected:hover img {
+    transform: none;
   }
   .is-hidden {
     display: none;
@@ -259,10 +283,6 @@ const tabData = [
   }
   #download:hover {
     background-color: #fac04b;
-    transform: scale(1.03);
-  }
-  #download:active {
-    transform: scale(0.98);
   }
 
   /* Desktop */

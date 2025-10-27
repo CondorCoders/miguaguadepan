@@ -1,46 +1,46 @@
 [
   {
     "id": "face1",
-    "image": "/guagua/faces/face1.png"
-  },
-  {
-    "id": "face2",
-    "image": "/guagua/faces/face2.png"
-  },
-  {
-    "id": "face3",
-    "image": "/guagua/faces/face3.png"
-  },
-  {
-    "id": "face4",
-    "image": "/guagua/faces/face4.png"
-  },
-  {
-    "id": "face5",
-    "image": "/guagua/faces/face5.png"
-  },
-  {
-    "id": "face6",
-    "image": "/guagua/faces/face6.png"
-  },
-  {
-    "id": "face7",
-    "image": "/guagua/faces/face7.png"
-  },
-  {
-    "id": "face8",
-    "image": "/guagua/faces/face8.png"
-  },
-  {
-    "id": "face9",
     "image": "/guagua/faces/face9.png"
   },
   {
-    "id": "face10",
+    "id": "face2",
     "image": "/guagua/faces/face10.png"
   },
   {
-    "id": "face11",
+    "id": "face3",
     "image": "/guagua/faces/face11.png"
+  },
+  {
+    "id": "face4",
+    "image": "/guagua/faces/face1.png"
+  },
+  {
+    "id": "face5",
+    "image": "/guagua/faces/face2.png"
+  },
+  {
+    "id": "face6",
+    "image": "/guagua/faces/face3.png"
+  },
+  {
+    "id": "face7",
+    "image": "/guagua/faces/face4.png"
+  },
+  {
+    "id": "face8",
+    "image": "/guagua/faces/face5.png"
+  },
+  {
+    "id": "face9",
+    "image": "/guagua/faces/face6.png"
+  },
+  {
+    "id": "face10",
+    "image": "/guagua/faces/face7.png"
+  },
+  {
+    "id": "face11",
+    "image": "/guagua/faces/face8.png"
   }
 ]
