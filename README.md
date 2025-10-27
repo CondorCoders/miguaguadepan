@@ -1,46 +1,50 @@
-# Astro Starter Kit: Basics
+# Mi Guagua de Pan
 
-```sh
-pnpm create astro@latest -- --template basics
-```
+![Vista previa](public/preview.png)
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Un editor web para diseñar tu propia “guagua de pan” de forma digital. Este proyecto nace de una tradición ecuatoriana que celebramos cada 2 de noviembre, donde las familias preparan y decoran guaguas de pan para compartir junto a la colada morada. Aquí quisimos digitalizar esa experiencia para que puedas combinar caritas, sombreros y vestuarios y descargar tu creación.
 
-## 🚀 Project Structure
+## Sobre la tradición
 
-Inside of your Astro project, you'll see the following folders and files:
+Las guaguas de pan son figuras de pan con forma de niño (guagua significa “niño” en kichwa) que simbolizan memoria y homenaje. Su origen se asocia a prácticas funerarias prehispánicas: en ciertas comunidades se momificaba a los líderes y se los llevaba en procesión; al prohibirse estos rituales en la colonia, la memoria se transformó en figuras de pan “envueltas” (sin brazos) rellenos como manjar o mermeladas. Cada 2 de noviembre, las familias ecuatorianas las preparan y decoran como ofrendas y expresión de unión, acompañadas de la colada morada: una bebida tradicional a base de frutas andinas y especias (mortiño, mora, piña, babaco, ishpingo, canela, entre otras).
 
-```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
-```
+Fuente: [PUCE — Colada morada y guagua de pan, el origen de una tradición ancestral](https://conexion.puce.edu.ec/colada-morada-y-guagua-de-pan-el-origen-de-una-tradicion-ancestral/)
 
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
+![Receta](public/receta.png)
+Recetas: [Guaguas de Pan por Layla Pujol](https://www.laylita.com/recipes/guaguas-de-pan-recipe/)
 
-## 🧞 Commands
+## Tecnologías y librerías externas
 
-All commands are run from the root of the project, from a terminal:
+- Astro (framework de sitios estáticos y SSR) — [astro.build](https://astro.build)
+- Konva (lienzo y manipulación de capas 2D) — [konvajs.org](https://konvajs.org)
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
+## Imágenes generadas con IA
 
-## 👀 Want to learn more?
+Todas las imágenes del editor (base, caras, sombreros y vestuarios) fueron creadas con herramientas de IA, combinando flujos con Gemini y ChatGPT.
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Ejecutar en local con npm
+
+Requisitos
+
+- Node.js 18+ (recomendado 18.14 o superior)
+- npm 9+
+
+Pasos
+
+1. Instala dependencias:
+   - `npm install`
+2. Inicia el entorno de desarrollo:
+   - `npm run dev`
+   - Abre http://localhost:4321 en tu navegador.
+3. Compila para producción:
+   - `npm run build`
+4. Previsualiza el build localmente:
+   - `npm run preview`
+
+## Créditos
+
+- Sofia Grijalva (CondorCoders)
+- [El Santana](https://github.com/ElSantanax) / Programador y diseño de imágenes con IA
+- [Michelle]() / Diseño de imágenes con IA y edición en Photoshop
+- [AndryOre]() / Tester
+- [gatunoneptuno]() / Tester
