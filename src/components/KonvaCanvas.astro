@@ -474,7 +474,17 @@
         img.src = "/logo.png";
       });
 
-      const dataURL = this.stage.toDataURL({ pixelRatio: 3 });
+      // Renderizar a Blob y descargar con Object URL (mejor UX que data:)
+      const canvasEl: HTMLCanvasElement = this.stage.toCanvas({
+        pixelRatio: 3,
+      });
+      const blob: Blob = await new Promise((resolve, reject) => {
+        canvasEl.toBlob(
+          (b) =>
+            b ? resolve(b) : reject(new Error("No se pudo crear el Blob")),
+          "image/png"
+        );
+      });
 
       if (backgroundNode) {
         backgroundNode.destroy();
@@ -483,10 +493,16 @@
         logoNode.destroy();
       }
       this.layer.draw();
+
+      const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = dataURL;
+      link.href = url;
       link.download = "mi-guagua-de-pan.png";
+      document.body.appendChild(link);
       link.click();
+      link.remove();
+      // Revocar después del click para liberar memoria
+      setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 
     // TRANSFORMER
