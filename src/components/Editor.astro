@@ -1,8 +1,6 @@
 ---
-import Image from "astro/components/Image.astro";
 import KonvaCanvas from "./KonvaCanvas.astro";
 import TabButton, { TargetType } from "./TabButton.astro";
-import logo from "../assets/logo.png";
 import hats from "../data/hats.json";
 import outfits from "../data/outfits.json";
 import faces from "../data/faces.json";
@@ -10,107 +8,77 @@ import faces from "../data/faces.json";
 const tabData = [
   {
     id: "hats",
+    type: "hat",
     target: TargetType.HATS,
     alt: "Sombreros",
+    content: hats,
   },
   {
     id: "faces",
+    type: "face",
     target: TargetType.FACES,
     alt: "Rostros",
+    content: faces,
   },
   {
     id: "outfits",
+    type: "outfit",
     target: TargetType.OUTFITS,
     alt: "Atuendos",
+    content: outfits,
   },
 ];
 ---
 
-<div id="container">
-  <main>
-    <nav>
-      <Image id="logo" src={logo} alt="Astro Logo" decoding={"async"} />
-    </nav>
-    <div class="content">
-      <section id="guagua" class="guagua">
-        <KonvaCanvas />
-        <button id="download" aria-label="Descargar imagen">
-          <img
-            src="/guagua/icons/descargar.svg"
-            alt="Descargar"
-            width="20"
-            height="20"
+<div class="content">
+  <section id="guagua" class="guagua">
+    <KonvaCanvas />
+    <button id="download" aria-label="Descargar imagen">
+      <img
+        src="/guagua/icons/descargar.svg"
+        alt="Descargar"
+        width="20"
+        height="20"
+      />
+      Descargar
+    </button>
+  </section>
+  <section id="editor">
+    <div
+      id="tabs"
+      class="section-tabs"
+      role="tablist"
+      aria-label="Editor de secciones"
+    >
+      {
+        tabData.map(({ id, target, alt }, index) => (
+          <TabButton
+            id={id}
+            target={target}
+            isActive={index === 0}
+            icon={id}
+            alt={alt}
           />
-          Descargar
-        </button>
-      </section>
-      <section id="editor">
-        <div
-          id="tabs"
-          class="section-tabs"
-          role="tablist"
-          aria-label="Editor de secciones"
-        >
-          {
-            tabData.map(({ id, target, alt }, index) => (
-              <TabButton
-                id={id}
-                target={target}
-                isActive={index === 0}
-                icon={id}
-                alt={alt}
-              />
-            ))
-          }
-        </div>
-
-        <div id="hats" class="gallery">
-          {
-            hats.map((hat) => (
-              <button
-                type="button"
-                class="gallery-item"
-                data-type="hat"
-                data-src={hat.image}
-              >
-                <img src={hat.image} alt={hat.id} />
-              </button>
-            ))
-          }
-        </div>
-
-        <div id="faces" class="gallery is-hidden">
-          {
-            faces.map((face) => (
-              <button
-                type="button"
-                class="gallery-item"
-                data-type="face"
-                data-src={face.image}
-              >
-                <img src={face.image} alt={face.id} />
-              </button>
-            ))
-          }
-        </div>
-
-        <div id="outfits" class="gallery is-hidden">
-          {
-            outfits.map((outfit) => (
-              <button
-                type="button"
-                class="gallery-item"
-                data-type="outfit"
-                data-src={outfit.image}
-              >
-                <img src={outfit.image} alt={outfit.id} />
-              </button>
-            ))
-          }
-        </div>
-      </section>
+        ))
+      }
     </div>
-  </main>
+    {
+      tabData.map(({ id, type, content }, index) => (
+        <div id={id} class={`gallery ${index !== 0 ? "is-hidden" : ""}`}>
+          {content.map((item) => (
+            <button
+              type="button"
+              class="gallery-item"
+              data-type={type}
+              data-src={item.image}
+            >
+              <img src={item.image} alt={item.id} />
+            </button>
+          ))}
+        </div>
+      ))
+    }
+  </section>
 </div>
 
 <script>
@@ -118,7 +86,6 @@ const tabData = [
   const tabsContainer = document.getElementById("tabs");
   const tabButtons = tabsContainer?.querySelectorAll("button[role='tab']");
   const tabContainers = editor?.querySelectorAll(".gallery");
-  const clearButton = document.getElementById("clear");
   const downloadButton = document.getElementById("download");
 
   tabsContainer?.addEventListener("click", (event) => {
@@ -166,134 +133,46 @@ const tabData = [
     }
   });
 
-  clearButton?.addEventListener("click", (event) => {
-    const customEvent = new CustomEvent("deleteSelected");
-    window.dispatchEvent(customEvent);
-  });
-
-  downloadButton?.addEventListener("click", (event) => {
+  downloadButton?.addEventListener("click", () => {
     const customEvent = new CustomEvent("downloadImage");
     window.dispatchEvent(customEvent);
   });
 </script>
 
 <style>
-  :global(html, body) {
-    margin: 0;
-    height: 100%;
-    overflow-x: hidden;
-  }
-
-  #container {
-    font-family: "Boogaloo", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-    width: 100%;
-    min-height: 100dvh;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  #container::before {
-    content: "";
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image: url("../assets/background.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: -1;
-
-    @media (width < 48rem) {
-      position: absolute;
-      background-attachment: scroll;
-    }
-  }
-
-  main {
-    min-height: 100dvh;
-    display: flex;
-    flex-direction: column;
-  }
-
+  /* Enfoque mobile-first */
   .content {
-    /* max-width: 80rem; */
-    /* margin: 0 auto; */
-    display: flex;
-    flex-wrap: wrap;
     flex: 1 1 auto;
-    align-items: center;
-    justify-content: center;
-    /* gap: 1rem; */
-    padding: 0 1rem;
-    /* min-height: 0; */
-
-    /* box-sizing: border-box; */
-    /* width: 100%; */
-
-    @media (width >= 48rem) {
-      /* flex-direction: row;
-      flex-wrap: wrap; */
-      gap: 5rem;
-      padding: 0;
-      margin: 0 auto;
-    }
+    display: grid;
+    grid-template-rows: 1fr auto;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    max-width: 1024px;
+    margin: 0 auto;
+    padding: 0 1rem 1rem;
+    min-height: 0;
   }
 
-  nav {
-    padding: 0 1rem;
-  }
-
-  @media (width >= 48rem) {
-    nav {
-      padding: 0 3rem;
-    }
-  }
-
-  .titulo {
-    font-size: 1.5rem;
-    margin: 0;
-    color: #ebd2a6;
-    letter-spacing: 0.02em;
-    text-shadow:
-      -1px -1px 0 #663613,
-      1px -1px 0 #663613,
-      -1px 1px 0 #663613,
-      1px 1px 0 #663613;
-  }
-
-  #logo {
-    width: 150px;
-    height: auto;
-  }
-
-  @media (width >= 48rem) {
-    #logo {
-      width: 13rem;
-    }
-  }
-
-  #editor {
-    width: 100%;
-    margin-top: auto;
+  /* Columna del canvas */
+  .guagua {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 0;
+  }
+
+  /* Columna del editor - móvil: anclado abajo */
+  #editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
     background-color: rgba(84, 42, 8, 0.3);
     backdrop-filter: blur(10px);
     border-radius: 1rem;
-    padding: 0.5rem 1.5rem 2rem 1.5rem;
-
-    @media (width >= 48rem) {
-      margin-top: 0;
-      width: 400px;
-
-      padding: 1rem 1.5rem;
-      margin-bottom: 0;
-    }
+    padding: 0.75rem 1rem;
+    max-height: 42vh;
+    overflow: hidden;
   }
 
   .section-tabs {
@@ -301,35 +180,14 @@ const tabData = [
     gap: 0.75rem;
   }
 
+  /* Galería - móvil: scroll horizontal */
   .gallery {
     padding: 0.2rem 0;
     display: flex;
     gap: 0.75rem;
     overflow-x: auto;
     overflow-y: hidden;
-
-    @media (width >= 48rem) {
-      padding: 0.5rem 0;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      overflow-y: auto;
-      overflow-x: hidden;
-      scroll-snap-type: y mandatory;
-      height: 300px;
-    }
-
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background: rgba(255, 161, 67, 0.5);
-      border-radius: 10px;
-    }
-    &::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 10px;
-    }
+    min-height: 0;
   }
 
   .gallery-item {
@@ -351,59 +209,37 @@ const tabData = [
     height: 80px;
     scroll-snap-align: center;
   }
-
-  .gallery-item:hover::before {
-    opacity: 1;
-  }
-
   .gallery-item:hover {
     background: rgba(254, 205, 110, 0.8);
     border-color: rgba(241, 164, 63, 0.5);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(210, 107, 0, 0.15);
   }
-
   .gallery-item:active {
     transform: translateY(0);
   }
-
   .gallery-item:focus-visible {
     outline: 2px solid #f1a43f;
     outline-offset: 2px;
   }
-
   .gallery-item img {
     width: 70%;
     height: 70%;
     object-fit: contain;
     display: block;
-    position: relative;
-    z-index: 1;
     transition: transform 0.2s ease;
   }
-
   .gallery-item:hover img {
     transform: scale(1.05);
   }
-
   .is-hidden {
     display: none;
   }
 
-  .guagua {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    justify-content: center;
-    align-items: center;
-    flex: 0 0 auto;
-    width: auto;
-    height: auto;
-  }
-
+  /* Botón de descarga debajo del canvas */
   #download {
     display: flex;
-    width: 100%;
+    width: 85%;
     gap: 0.5rem;
     align-items: center;
     justify-content: center;
@@ -411,7 +247,6 @@ const tabData = [
     color: #663613;
     border: none;
     border-radius: 0.8rem;
-    margin-bottom: 1rem;
     padding: 0.75rem 0.75rem;
     font-size: 1rem;
     font-weight: 700;
@@ -422,21 +257,58 @@ const tabData = [
       transform 0.2s;
     outline: none;
   }
-
-  @media (width >= 48rem) {
-    #download {
-      padding: 0.75rem 0.75rem;
-      top: 1rem;
-      right: 1rem;
-    }
-  }
-
   #download:hover {
     background-color: #fac04b;
     transform: scale(1.03);
   }
-
   #download:active {
     transform: scale(0.98);
+  }
+
+  /* Desktop */
+  @media (width >= 48rem) {
+    .content {
+      width: 100%;
+      grid-template-rows: 1fr;
+      grid-template-columns: 1fr 1fr; /* canvas | editor */
+      align-items: stretch;
+      gap: 1.5rem;
+      padding: 0 1rem 1.5rem;
+    }
+
+    #editor {
+      max-height: 65%;
+    }
+
+    /* Galería: lista vertical con scroll interno */
+    .gallery {
+      padding: 0.5rem 0;
+      flex-wrap: wrap;
+      gap: 1rem;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scroll-snap-type: y mandatory;
+      max-height: 100%;
+    }
+  }
+
+  /* Estilos del scrollbar de la galería */
+  .gallery {
+    /* Firefox */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 161, 67, 0.5) rgba(255, 255, 255, 0.2);
+  }
+  /* WebKit */
+  .gallery::-webkit-scrollbar {
+    width: 8px; /* scroll vertical (desktop) */
+    height: 8px; /* scroll horizontal (móvil) */
+  }
+  .gallery::-webkit-scrollbar-thumb {
+    background: rgba(255, 161, 67, 0.5);
+    border-radius: 10px;
+  }
+  .gallery::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
   }
 </style>
