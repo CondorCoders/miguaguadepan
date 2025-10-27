@@ -299,11 +299,13 @@
         this.centerImage(konvaImage, width, height, initialPosition);
 
         this.contentGroup.add(konvaImage);
+
+        this.addTransformer(konvaImage);
+        this.attachDeleteButton(konvaImage);
+
         this.scheduleRedraw();
       };
       imageObj.src = src;
-
-      this.addTransformer(konvaImage);
 
       return konvaImage;
     }

@@ -1,0 +1,103 @@
+---
+const { id, title } = Astro.props;
+---
+
+<dialog id={id}>
+  <div class="modal-title">
+    <h2>{title}</h2>
+    <button autofocus class="close-btn" data-dialog={id}>x</button>
+  </div>
+  <div class="modal-content">
+    <slot />
+  </div>
+</dialog>
+
+<!-- <script>
+  const historyDialog = document.getElementById(
+    "history-modal"
+  ) as HTMLDialogElement;
+  const creditsDialog = document.getElementById(
+    "credits-modal"
+  ) as HTMLDialogElement;
+  const closeButton = document?.querySelector(".close-btn");
+
+  // "Close" button closes the dialog
+  closeButton?.addEventListener("click", () => {
+    const dialogId = closeButton.getAttribute("data-dialog");
+
+    console.log("dialogId", dialogId);
+
+    if (dialogId === "history-modal") {
+      console.log("closing history", historyDialog);
+      historyDialog?.close();
+    } else if (dialogId === "credits-modal") {
+      console.log("closing credits", creditsDialog);
+      creditsDialog?.close();
+    }
+  });
+</script> -->
+
+<style>
+  /* modal backdrop */
+  ::backdrop {
+    background-color: #000;
+    opacity: 0.5;
+  }
+
+  dialog {
+    width: 80%;
+    background-color: #fecc69;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .modal-title {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    h2 {
+      margin: 0;
+    }
+  }
+
+  .modal-content {
+    font-family: Arial, Helvetica, sans-serif;
+    margin-top: 1rem;
+    line-height: 1.5;
+
+    a {
+      color: #663613;
+      text-decoration: underline;
+    }
+  }
+
+  .close-btn {
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #663613;
+    border-radius: 50%;
+    padding: 0;
+    transition: background-color 0.2s;
+  }
+
+  .close-btn:hover {
+    background-color: #66361322;
+  }
+
+  @media (width >= 48rem) {
+    dialog {
+      max-width: 600px;
+    }
+  }
+</style>

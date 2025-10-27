@@ -156,7 +156,7 @@ const tabData = [
     gap: 1rem;
     max-width: 1024px;
     margin: 0 auto;
-    padding: 0 1rem 1rem;
+    padding: 1rem 1rem 0 1rem;
     min-height: 0;
   }
 
@@ -288,12 +288,11 @@ const tabData = [
   /* Desktop */
   @media (width >= 48rem) {
     .content {
-      width: 100%;
       grid-template-rows: 1fr;
       grid-template-columns: 1fr 1fr; /* canvas | editor */
       align-items: stretch;
       gap: 1.5rem;
-      padding: 0 1rem 1.5rem;
+      padding: 1rem 1.5rem;
     }
 
     #editor {

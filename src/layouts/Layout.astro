@@ -1,6 +1,41 @@
 ---
 import logo from "../assets/logo.png";
 import Image from "astro/components/Image.astro";
+import Modal from "../components/Modal.astro";
+import Analytics from "@vercel/analytics/astro";
+
+const credits = [
+  {
+    id: "sofia-grijalva",
+    name: "Sofía Grijalva",
+    role: "CondorCoders",
+    url: "https://github.com/CondorCoders",
+  },
+  {
+    id: "el-santana",
+    name: "El Santana",
+    role: "Programador y diseño de imágenes con IA",
+    url: "https://github.com/ElSantanax",
+  },
+  {
+    id: "michelle",
+    name: "Michelle",
+    role: "Diseño de imágenes con IA y edición en Photoshop",
+    // url: "https://github.com/Michelle",
+  },
+  {
+    id: "andryore",
+    name: "AndryOre",
+    role: "Tester",
+    // url: "https://github.com/AndryOre",
+  },
+  {
+    id: "gatunoneptuno",
+    name: "gatunoneptuno",
+    role: "Tester",
+    // url: "https://github.com/gatunoneptuno",
+  },
+];
 ---
 
 <!doctype html>
@@ -10,17 +45,58 @@ import Image from "astro/components/Image.astro";
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/logo.png" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="author" content="CondorCoders" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Boogaloo&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://miguaguadepan.condorcoders.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Mi Guagua de Pan" />
+    <meta
+      property="og:description"
+      content="Crea tu propia guagua de pan personalizada con nuestro editor interactivo. ¡Elige entre una variedad de sombreros, caras y atuendos para diseñar la guagua de pan perfecta!"
+    />
+    <meta property="og:image" content="/logo.png" />
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta property="twitter:domain" content="miguaguadepan.condorcoders.com" />
+    <meta
+      property="twitter:url"
+      content="https://miguaguadepan.condorcoders.com/"
+    />
+    <meta name="twitter:title" content="Mi Guagua de Pan" />
+    <meta
+      name="twitter:description"
+      content="Crea tu propia guagua de pan personalizada con nuestro editor interactivo. ¡Elige entre una variedad de sombreros, caras y atuendos para diseñar la guagua de pan perfecta!"
+    />
+    <meta name="twitter:image" content="/logo.png" />
+
     <title>Mi Guagua de Pan</title>
     <meta
       name="description"
       content="Crea tu propia guagua de pan personalizada con nuestro editor interactivo. ¡Elige entre una variedad de sombreros, caras y atuendos para diseñar la guagua de pan perfecta!"
     />
+
+    <script type="text/javascript">
+      (function (c, l, a, r, i, t, y) {
+        c[a] =
+          c[a] ||
+          function () {
+            (c[a].q = c[a].q || []).push(arguments);
+          };
+        t = l.createElement(r);
+        t.async = 1;
+        t.src = "https://www.clarity.ms/tag/" + i;
+        y = l.getElementsByTagName(r)[0];
+        y.parentNode.insertBefore(t, y);
+      })(window, document, "clarity", "script", "twrzusf95a");
+    </script>
   </head>
 
   <body>
@@ -32,10 +108,105 @@ import Image from "astro/components/Image.astro";
           alt="Mi Guagua de Pan Logo"
           decoding={"async"}
         />
+        <div class="nav-buttons">
+          <button id="history" class="btn">Historia</button>
+          <button id="credits" class="btn">Créditos</button>
+        </div>
       </nav>
       <slot />
+      <Modal id="history-modal" title="Sobre la tradición">
+        <p>
+          Las guaguas de pan son figuras de pan con forma de niño (guagua
+          significa “niño” en kichwa) que simbolizan memoria y homenaje. Su
+          origen se asocia a prácticas funerarias prehispánicas: en ciertas
+          comunidades se momificaba a los líderes y se los llevaba en procesión;
+          al prohibirse estos rituales en la colonia, la memoria se transformó
+          en figuras de pan “envueltas” (sin brazos) rellenos como manjar o
+          mermeladas. Cada 2 de noviembre, las familias ecuatorianas las
+          preparan y decoran como ofrendas y expresión de unión, acompañadas de
+          la colada morada: una bebida tradicional a base de frutas andinas y
+          especias (mortiño, mora, piña, babaco, ishpingo, canela, entre otras).
+        </p>
+        <p>
+          Fuente:
+          <a
+            href="https://conexion.puce.edu.ec/colada-morada-y-guagua-de-pan-el-origen-de-una-tradicion-ancestral/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >PUCE — Colada morada y guagua de pan, el origen de una tradición
+            ancestral</a
+          >
+        </p>
+      </Modal>
+      <Modal id="credits-modal" title="Créditos">
+        <p>
+          Este proyecto fue realizado por la comunidad de <a
+            href="https://github.com/CondorCoders"
+            target="_blank"
+            rel="noopener noreferrer">CondorCoder</a
+          >. Encuentra el código fuente en nuestro
+          <a
+            href="https://github.com/CondorCoders/miguaguadepan"
+            target="_blank"
+            rel="noopener noreferrer">repositorio de GitHub</a
+          >.
+        </p>
+        <ul>
+          {
+            credits.map(({ id, name, role, url }) => (
+              <li>
+                {url ? (
+                  <a href={url} target="_blank" rel="noopener noreferrer">
+                    {name}
+                  </a>
+                ) : (
+                  name
+                )}
+                / {role}
+              </li>
+            ))
+          }
+        </ul>
+      </Modal>
     </main>
+    <Analytics />
   </body>
+
+  <script>
+    const modalButtons = document.querySelectorAll(".nav-buttons .btn");
+    const historyDialog = document.getElementById(
+      "history-modal"
+    ) as HTMLDialogElement;
+    const creditsDialog = document.getElementById(
+      "credits-modal"
+    ) as HTMLDialogElement;
+    const closeButtons = document?.querySelectorAll(".close-btn");
+
+    modalButtons?.forEach((button) => {
+      button?.addEventListener("click", () => {
+        const buttonId = button.getAttribute("id");
+
+        if (buttonId === "history") {
+          historyDialog?.showModal();
+        } else if (buttonId === "credits") {
+          creditsDialog?.showModal();
+        }
+      });
+    });
+
+    // "Close" button closes the dialog
+    closeButtons?.forEach((button) => {
+      button?.addEventListener("click", () => {
+        const dialogId = button.getAttribute("data-dialog");
+
+        if (dialogId === "history-modal") {
+          historyDialog?.close();
+        } else if (dialogId === "credits-modal") {
+          creditsDialog?.close();
+        }
+      });
+    });
+  </script>
 
   <style>
     html,
@@ -82,11 +253,42 @@ import Image from "astro/components/Image.astro";
 
     nav {
       padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 1rem;
     }
 
     #logo {
-      width: 150px;
+      width: 6rem;
       height: auto;
+    }
+
+    .btn {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      justify-content: center;
+      background-color: #fecc69;
+      color: #663613;
+      border: none;
+      border-radius: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      font-size: 1rem;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(210, 107, 0, 0.15);
+      cursor: pointer;
+      transition:
+        background 0.2s,
+        transform 0.2s;
+      outline: none;
+    }
+    .btn:hover {
+      background-color: #fac04b;
     }
 
     @media (width >= 48rem) {
