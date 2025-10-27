@@ -1,7 +1,3 @@
----
-// KonvaCanvas.astro - Componente para el canvas de Konva (REFACTORIZADO)
----
-
 <div id="konva-container" class="konva-container">
   <div id="konva-stage"></div>
 </div>
@@ -10,45 +6,29 @@
   // Importar Konva dinámicamente
   let Konva: any;
 
-  // Configuración centralizada del canvas
-  const CANVAS_CONFIG = {
-    mobile: {
-      width: 280,
-      height: 400,
-      baseSizes: { hat: 100, face: 70, outfit: 150 },
-      baseScale: 0.65, // Tamaño de la imagen base
-    },
-    desktop: {
-      width: 400,
-      height: 630,
-      baseSizes: { hat: 220, face: 120, outfit: 260 },
-      baseScale: 0.7, // Tamaño de la imagen base
-    },
-    breakpoint: 600,
+  // Configuración responsiva del canvas
+  const RESPONSIVE_CONFIG = {
+    // Anchura base de cada elemento relativa al ancho del canvas
+    baseFactors: { hat: 0.45, face: 0.28, outfit: 0.6 },
+    // Escala de la imagen base (muñeco) dentro del stage
+    baseImageScale: 0.7,
+    // Límites de escala para transformaciones
     scaleConstraints: { min: 0.2, max: 4 },
-  };
-
-  // Posiciones iniciales centralizadas
-  const INITIAL_POSITIONS = {
-    mobile: {
-      hat: { x: 140, y: 85 },
-      face: { x: 140, y: 150 },
-      outfit: { x: 140, y: 255 },
-    },
-    desktop: {
-      hat: { x: 200, y: 150 },
-      face: { x: 200, y: 240 },
-      outfit: { x: 200, y: 400 },
-    },
-  };
+    // Relación de aspecto preferida del lienzo (ancho/alto). Corresponde aprox. al marco.
+    aspectRatio: 400 / 630,
+  } as const;
 
   class GuaguaCanvas {
     private stage: any;
     private layer: any;
+    private contentGroup: any;
+    private baseStageSize: { w: number; h: number } = {
+      w: 400,
+      h: Math.round(400 / RESPONSIVE_CONFIG.aspectRatio), // ~630
+    };
     private baseImage: any = null;
     private transformer: any = null;
     private deleteButton: any = null;
-    private isMobile: boolean = false;
     private needsRedraw: boolean = false;
     private pendingVersions: Record<string, number> = {
       hat: 0,
@@ -71,17 +51,27 @@
         throw new Error(`Container with id "${containerId}" not found`);
       }
 
-      this.isMobile = window.innerWidth < CANVAS_CONFIG.breakpoint;
-      const config = this.getConfig();
+      // Fit inicial al tamaño disponible del contenedor padre
+      const { width: initW, height: initH } = GuaguaCanvas.getContainerSize(
+        container.parentElement as HTMLDivElement
+      );
 
       this.stage = new Konva.Stage({
         container: container as HTMLDivElement,
-        width: config.width,
-        height: config.height,
+        width: initW,
+        height: initH,
       });
 
       this.layer = new Konva.Layer();
       this.stage.add(this.layer);
+
+      // Guardar tamaño base de diseño sólo si hay medidas válidas; si no, usar fallback 400x630
+      if (initW > 0 && initH > 0) {
+        this.baseStageSize = { w: initW, h: initH };
+      }
+      // Grupo raíz cuyo contenido se escala/centra al redimensionar
+      this.contentGroup = new Konva.Group({ name: "content-root" });
+      this.layer.add(this.contentGroup);
 
       // Listener global de deselección
       this.stage.on("click tap", (e: any) => {
@@ -92,18 +82,21 @@
 
       this.loadBaseImage();
       this.setupEventListeners();
+      // Ajustar escala y centrado inicial por si el contenedor cambia inmediatamente
+      this.updateScaleAndPosition();
     }
 
-    // MÉTODOS AUXILIARES CENTRALIZADOS
-
-    private getConfig() {
-      return this.isMobile ? CANVAS_CONFIG.mobile : CANVAS_CONFIG.desktop;
-    }
-
-    private getPositions() {
-      return this.isMobile
-        ? INITIAL_POSITIONS.mobile
-        : INITIAL_POSITIONS.desktop;
+    // MÉTODOS AUXILIARES
+    static getContainerSize(container: HTMLDivElement) {
+      if (!container) return { width: 0, height: 0 };
+      const width = Math.round(container.clientWidth || 0);
+      // Si el alto no está definido aún (0), deducirlo por la relación de aspecto preferida
+      const height = Math.round(
+        container.clientHeight && container.clientHeight > 0
+          ? container.clientHeight
+          : width / RESPONSIVE_CONFIG.aspectRatio
+      );
+      return { width, height };
     }
 
     private setCursor(cursor: string) {
@@ -126,7 +119,7 @@
     }
 
     private constrainScale(scale: number): number {
-      const { min, max } = CANVAS_CONFIG.scaleConstraints;
+      const { min, max } = RESPONSIVE_CONFIG.scaleConstraints;
       return Math.min(max, Math.max(min, scale));
     }
 
@@ -176,16 +169,15 @@
     }
 
     // IMAGEN BASE
-
     private async loadBaseImage() {
       const imageObj = new Image();
       imageObj.crossOrigin = "anonymous";
 
       return new Promise<void>((resolve) => {
         imageObj.onload = () => {
-          const stageWidth = this.stage.width();
-          const stageHeight = this.stage.height();
-          const scale = this.getConfig().baseScale;
+          const stageWidth = this.baseStageSize.w;
+          const stageHeight = this.baseStageSize.h;
+          const scale = RESPONSIVE_CONFIG.baseImageScale;
 
           // Calcular dimensiones manteniendo aspecto
           const naturalAspect = imageObj.naturalWidth / imageObj.naturalHeight;
@@ -206,7 +198,7 @@
             height: imgHeight,
             listening: false,
           });
-          this.layer.add(this.baseImage);
+          this.contentGroup.add(this.baseImage);
           this.scheduleRedraw();
           resolve();
         };
@@ -215,7 +207,6 @@
     }
 
     // IMAGEN DRAGGABLE
-
     private setupImageEventHandlers(konvaImage: any) {
       // Click/Tap: seleccionar
       konvaImage.on("click tap", (e: any) => {
@@ -288,10 +279,12 @@
           return;
         }
 
-        const baseSizes = this.getConfig().baseSizes;
-        const baseWidth =
-          baseSizes[id as keyof typeof baseSizes] ||
-          (this.isMobile ? 100 : 120);
+        // Anchura base relativa al ancho del stage
+        const factor =
+          RESPONSIVE_CONFIG.baseFactors[
+            id as keyof typeof RESPONSIVE_CONFIG.baseFactors
+          ] || 0.4;
+        const baseWidth = this.baseStageSize.w * factor;
 
         // Calcular dimensiones
         const { width, height } = this.calculateProportionalDimensions(
@@ -305,7 +298,7 @@
         konvaImage.height(height);
         this.centerImage(konvaImage, width, height, initialPosition);
 
-        this.layer.add(konvaImage);
+        this.contentGroup.add(konvaImage);
         this.scheduleRedraw();
       };
       imageObj.src = src;
@@ -314,7 +307,6 @@
     }
 
     // EVENT LISTENERS
-
     private setupEventListeners() {
       const eventHandler = (event: any) => {
         switch (event.type) {
@@ -354,7 +346,6 @@
     }
 
     // AÑADIR ELEMENTOS
-
     private addElement(type: "hat" | "face" | "outfit", src: string) {
       this.pendingVersions[type] += 1;
       const version = this.pendingVersions[type];
@@ -362,14 +353,25 @@
       this.createDraggableImage(
         src,
         type,
-        this.getPositions()[type],
+        this.getInitialPosition(type),
         1.0,
         version
       );
     }
 
-    // ELIMINAR ELEMENTOS
+    private getInitialPosition(type: "hat" | "face" | "outfit") {
+      const w = this.baseStageSize.w;
+      const h = this.baseStageSize.h;
+      const x = w / 2;
+      const yMap: Record<typeof type, number> = {
+        hat: 0.22 * h,
+        face: 0.38 * h,
+        outfit: 0.65 * h,
+      } as const;
+      return { x, y: yMap[type] };
+    }
 
+    // ELIMINAR ELEMENTOS
     public removeElement(type: string) {
       const elements = this.layer.find(`#${type}`);
       elements.forEach((element: any) => element.destroy());
@@ -389,7 +391,7 @@
         this.scheduleRedraw();
       }
     }
-
+    // DESCARGAR IMAGEN
     public async downloadImage() {
       this.removeTransformer();
       this.removeDeleteButton();
@@ -452,7 +454,8 @@
           const desiredWidth = 100;
           const aspect = img.naturalHeight / img.naturalWidth || 1;
           const desiredHeight = desiredWidth * aspect;
-          const margin = this.isMobile ? 6 : 10;
+          const isSmall = this.stage.width() < 420;
+          const margin = isSmall ? 6 : 10;
 
           const x = margin; // Esquina superior izquierda
           const y = margin - 10; // Más arriba
@@ -506,7 +509,6 @@
     }
 
     // TRANSFORMER
-
     private addTransformer(node: any) {
       if (!this.transformer) {
         this.transformer = new Konva.Transformer({
@@ -535,7 +537,6 @@
     }
 
     // BOTÓN DE BORRAR
-
     private attachDeleteButton(node: any) {
       this.removeDeleteButton();
 
@@ -608,47 +609,97 @@
     }
 
     // RESIZE
+    private updateScaleAndPosition() {
+      const stageW = this.stage.width();
+      const stageH = this.stage.height();
+      const baseW = this.baseStageSize.w;
+      const baseH = this.baseStageSize.h;
+      if (baseW <= 0 || baseH <= 0) return;
+
+      const scale = Math.min(stageW / baseW, stageH / baseH);
+      this.contentGroup.scale({ x: scale, y: scale });
+      const offX = (stageW - baseW * scale) / 2;
+      const offY = (stageH - baseH * scale) / 2;
+      this.contentGroup.position({ x: offX, y: offY });
+
+      // Forzar actualización del transformer si existe
+      if (
+        this.transformer &&
+        typeof this.transformer.forceUpdate === "function"
+      ) {
+        this.transformer.forceUpdate();
+      }
+
+      this.scheduleRedraw();
+    }
 
     public resize(width: number, height: number) {
+      if (!width || !height) return;
       this.stage.width(width);
       this.stage.height(height);
-      this.scheduleRedraw();
+      // Si aún no tenemos tamaño base válido, inicializarlo ahora
+      if (this.baseStageSize.w <= 0 || this.baseStageSize.h <= 0) {
+        this.baseStageSize = { w: width, h: height };
+      }
+      this.updateScaleAndPosition();
     }
   }
 
   // RESPONSIVE
-
   const updateResponsiveCanvasSize = (canvas: any) => {
-    const container = document.getElementById("konva-container");
+    const container = document.getElementById(
+      "konva-container"
+    ) as HTMLDivElement | null;
     if (!container) return;
 
-    const isMobile = window.innerWidth < CANVAS_CONFIG.breakpoint;
-    const config = isMobile ? CANVAS_CONFIG.mobile : CANVAS_CONFIG.desktop;
+    // Dimensionarse a partir del área real del canvas (sección #guagua en Editor.astro)
+    const guagua = document.getElementById("guagua") as HTMLElement | null;
+    const downloadBtn = document.getElementById(
+      "download"
+    ) as HTMLElement | null;
 
-    const { vh, vw } = (
-      window as any
-    ).guaguaCanvas?.getViewportDimensions() || {
-      vh: Math.max(
+    const vw = Math.max(
+      document.documentElement.clientWidth || 0,
+      window.innerWidth || 0
+    );
+    const isWide = window.matchMedia("(min-width: 48rem)").matches;
+    const gap = 16; // espacio vertical entre canvas y botón
+
+    // Medir ancho disponible: usar el ancho efectivo del contenedor de canvas (columna de #guagua)
+    const availableWidth = Math.max(
+      0,
+      guagua?.clientWidth ||
+        container.parentElement?.clientWidth ||
+        container.clientWidth ||
+        Math.floor(0.9 * vw)
+    );
+
+    // Medir alto disponible: altura de #guagua menos la altura del botón y un gap
+    const btnH = downloadBtn ? downloadBtn.offsetHeight : 0;
+    const guaguaHeight =
+      guagua?.clientHeight || container.parentElement?.clientHeight || 0;
+    let availableHeight = Math.max(0, guaguaHeight - btnH - gap);
+    // Fallback si aún no hay layout
+    if (!availableHeight) {
+      const vh = Math.max(
         document.documentElement.clientHeight || 0,
         window.innerHeight || 0
-      ),
-      vw: Math.max(
-        document.documentElement.clientWidth || 0,
-        window.innerWidth || 0
-      ),
-    };
+      );
+      availableHeight = isWide ? Math.floor(0.85 * vh) : Math.floor(0.48 * vh);
+    }
 
-    const maxHeight = Math.floor(0.8 * vh);
-    const maxWidth = Math.floor(0.98 * vw);
+    // Ajustar tamaño del stage manteniendo aspecto y sin exceder el espacio disponible
+    const aspect = RESPONSIVE_CONFIG.aspectRatio; // w/h
+    const widthByHeight = Math.floor(availableHeight * aspect);
+    const width = Math.min(availableWidth, widthByHeight);
+    const height = Math.round(width / aspect);
 
-    const width = Math.min(container.offsetWidth || vw, config.width, maxWidth);
-    const height = Math.min(config.height, maxHeight);
-
+    container.style.width = `${width}px`;
+    container.style.height = `${height}px`;
     canvas.resize(width, height);
   };
 
   // INICIALIZACIÓN
-
   document.addEventListener("DOMContentLoaded", async () => {
     try {
       const konvaModule = await import("konva");
@@ -656,10 +707,22 @@
 
       const canvas = new GuaguaCanvas("konva-stage");
 
+      // Ajuste inicial y observers para cambios de tamaño
       updateResponsiveCanvasSize(canvas);
       window.addEventListener("resize", () =>
         updateResponsiveCanvasSize(canvas)
       );
+
+      const container = document.getElementById(
+        "konva-container"
+      ) as HTMLDivElement | null;
+      const guagua = document.getElementById("guagua") as HTMLDivElement | null;
+      if ("ResizeObserver" in window) {
+        const ro = new ResizeObserver(() => updateResponsiveCanvasSize(canvas));
+        if (container) ro.observe(container);
+        if (guagua) ro.observe(guagua);
+        (window as any).guaguaResizeObserver = ro;
+      }
 
       (window as any).guaguaCanvas = canvas;
     } catch (error) {
@@ -675,8 +738,9 @@
     align-items: center;
     width: auto;
     height: auto;
+    aspect-ratio: 400 / 630; /* Mantener relación de aspecto del lienzo/marco */
     max-width: 100vw;
-    max-height: 80vh;
+    max-height: 95dvh;
     margin: 0 auto;
     box-sizing: border-box;
     background-image: url(/guagua/marco.jpg);
@@ -691,8 +755,10 @@
     display: block;
     margin: 0 auto;
     max-width: 100vw;
-    max-height: 80vh;
+    max-height: 95dvh;
     width: auto;
     height: auto;
   }
+
+  /* Mantener la altura acotada también en desktop para evitar scroll de página */
 </style>
